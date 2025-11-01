@@ -1,1 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Printer Receiver - PrintEase</title>
+  <style>
+    body { font-family: sans-serif; background: #222; color: #fff; padding: 20px; }
+    h2 { color: #4CAF50; }
+    .job { background: #333; margin: 10px; padding: 10px; border-radius: 8px; }
+    button { padding: 8px; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <h2>🖨️ Printer Receiver Dashboard</h2>
+  <div id="jobs"></div>
+
+  <script>
+    async function fetchJobs() {
+      const res = await fetch("http://localhost:5000/jobs/pending");
+      const jobs = await res.json();
+
+      const container = document.getElementById("jobs");
+      container.innerHTML = "";
+      if (jobs.length === 0) {
+        container.innerHTML = "<p>No pending jobs.</p>";
+        return;
+      }
+
+      jobs.forEach((j) => {
+        const div = document.createElement("div");
+        div.className = "job";
+        div.innerHTML = `
+          <p><b>${j.name}</b> - ${j.color}</p>
+          <p>File: <a href="http://localhost:5000/${j.path}" target="_blank" style="color:#90caf9;">${j.filename}</a></p>
+          <button onclick="printJob('${j.id}', '${j.path}')">🖨️ Print Now</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    async function printJob(id, path) {
+      // Simulated printing (in real case, use system print command)
+      alert("Printing file: " + path);
+
+      await fetch("http://localhost:5000/jobs/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: "printed" }),
+      });
+      fetchJobs();
+    }
+
+    setInterval(fetchJobs, 5000);
+    fetchJobs();
+  </script>
+</body>
+</html>
 
