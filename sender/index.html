@@ -1,1 +1,46 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PrintEase - Upload</title>
+  <style>
+    body { font-family: sans-serif; background: #f5f5f5; padding: 40px; }
+    form { background: white; padding: 20px; border-radius: 8px; width: 400px; margin: auto; }
+    input, select, button { width: 100%; margin: 10px 0; padding: 10px; }
+    h2 { text-align: center; }
+  </style>
+</head>
+<body>
+  <h2>🖨️ PrintEase - Upload Your File</h2>
+  <form id="uploadForm">
+    <input type="text" name="name" placeholder="Your Name" required />
+    <input type="file" name="file" required />
+    <select name="color">
+      <option value="color">Color Print</option>
+      <option value="bw">Black & White</option>
+    </select>
+    <button type="submit">Pay ₹2 & Upload</button>
+  </form>
+
+  <p id="result"></p>
+
+  <script>
+    document.getElementById("uploadForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+
+      // Simulate payment (in real case, integrate Razorpay)
+      alert("Payment successful ✅");
+
+      const res = await fetch("http://localhost:5000/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      document.getElementById("result").textContent = 
+        "Uploaded successfully. Job ID: " + data.job.id;
+    };
+  </script>
+</body>
+</html>
