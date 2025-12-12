@@ -1,6 +1,10 @@
 <img width="1024" height="1024" alt="flow-diagram" src="https://github.com/user-attachments/assets/e1e8cc73-4e42-4b27-9f18-ac25d932282b" />
 
 
+   <img width="2816" height="1536" alt="printing" src="https://github.com/user-attachments/assets/30023353-a27a-4310-aa10-e4b27fdb5d50" />
+
+
+
 # Auto-Print & Delete Automation
 
 This project automates the process of printing PDF files. It monitors a specific folder (e.g., "print"); whenever a PDF is detected, it automatically sends it to the default printer and deletes the file afterward.
