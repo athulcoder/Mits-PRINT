@@ -65,7 +65,7 @@ export default function PrintLoader() {
           className="hidden"
           onChange={handleFiles}
         />
-        <p className="text-sm text-gray-600 bg-blue-400 px-3 py-3 rounded-xl text-white">
+        <p className="text-sm  bg-blue-400 px-3 py-3 rounded-xl text-white">
           Upload PDF or DOCX files
         </p>
       </label>
