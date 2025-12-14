@@ -13,3 +13,10 @@ export async function handleCancel(onClose){
     onClose()
     
 }
+
+
+
+export async function calculateAmount(files){
+
+
+}

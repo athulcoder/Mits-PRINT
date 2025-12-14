@@ -12,7 +12,7 @@ export default function PrintLoader() {
 
   function calculateAmount(){
     setShowPayBox(true)
-    console.log(files)
+    calc
   }
 
   const allowedTypes = [
