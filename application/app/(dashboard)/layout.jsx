@@ -10,7 +10,7 @@ import Navbar from '../../components/Navbar'
      if(!session) redirect('/login')
   
         const user = session;
-        return <div className='bg-[#f7f7f7] h-screen w-full relative'>
+        return <div className='bg-[#f4f4f4] min-h-screen  max-h-fit w-full relative'>
         <Navbar user={user}/>
         {children}
     </div>

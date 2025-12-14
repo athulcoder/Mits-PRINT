@@ -1,6 +1,12 @@
-import React from 'react'
+"use client"
 
-const FIleCard = ({item, update, removeFile, index}) => {
+import React, { useState } from 'react'
+
+const FileCard = ({item, update, removeFile, index}) => {
+
+
+    const [customValueClicked,setCustomValueClicked] = useState(false)
+    
   return (
    <div
      
@@ -28,11 +34,11 @@ const FIleCard = ({item, update, removeFile, index}) => {
               <select
               className="h-8 px-2 text-sm border rounded-md"
                 onChange={e =>
-                  update(index, "color", e.target.checked)
+                  update(index, "color", e.target.value)
                 }
               >
-                <option>B&W</option>
-                <option>Color</option>
+                <option value="BLACK_WHITE">B&W</option>
+                <option value='COLOR'>Color</option>
               </select>
             
             </label>
@@ -50,6 +56,69 @@ const FIleCard = ({item, update, removeFile, index}) => {
               Both sides
             </label>
 
+
+             {/* Orientation */}
+            <label className="flex items-center gap-1">
+                Orientation 
+              <select
+              className="h-8 px-2 text-sm border rounded-md"
+                onChange={e =>
+                  update(index, "orientation", e.target.value)
+                }
+              >
+                <option value="PORTRAIT">Portrait</option>
+                <option value="LANDSCAPE">LandScape</option>
+              </select>
+            
+            </label>
+
+             {/* Pages range */}
+            <label className="flex items-center gap-1">
+                PagesRange 
+              <select
+              className="h-8 px-2 text-sm border rounded-md"
+                
+                onChange={e =>{
+                  update(index, "pagesRange", e.target.value)
+                   if(e.target.value==="CUSTOM") setCustomValueClicked(true);
+                   else setCustomValueClicked(false)
+                }
+                }
+              >
+                <option value="ALL">ALL</option>
+                <option value="ODD">ODD</option>
+                <option value="EVEN">EVEN</option>
+                <option value="CUSTOM">CUSTOM</option>
+              </select>
+
+
+            
+            </label>
+
+
+            {customValueClicked? 
+            <label className="flex items-center gap-1">
+                Range
+             <input
+  type="text"
+  className="h-[23px] border outline-none border-gray-200 px-1 py-2 w-[100px] focus:border-green-400"
+  placeholder="1-5"
+  value={item.pagesCustomValue}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    // Allow only numbers and dash
+    if (/^[0-9-]*$/.test(value)) {
+      update(index, "pagesCustomValue", value);
+    }
+  }}
+/>
+            <p>Eg: 1-3 , 4-9 </p>
+            </label> :""}
+          
+                
+
+
           </div>
 
           <button
@@ -62,4 +131,4 @@ const FIleCard = ({item, update, removeFile, index}) => {
   )
 }
 
-export default FIleCard
+export default FileCard;

@@ -7,9 +7,9 @@ const Homepage = async() => {
 
 
 
-  return <section className='flex flex-col  items-center py-3 w-full bg-green-50 h-full'>
+  return <section className='flex flex-col  items-center py-3 w-full  h-full min-h-fit'>
     <h1 className='text-xl font-sans'> 
-      FILE UPLOAD 
+       UPLOAD FILE
     </h1>
 
 

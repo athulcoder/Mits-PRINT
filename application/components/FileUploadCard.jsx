@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import FIleCard from "./FIleCard";
+import FileCard from "./FIleCard";
 
 export default function PrintLoader() {
   const [files, setFiles] = useState([]);
@@ -25,8 +25,11 @@ export default function PrintLoader() {
       .map(file => ({
         file,
         copies: 1,
-        color: false,      // false = B/W
-        doubleSide: false, // false = single side
+        color: "BLACK_WHITE",      // false = B/W
+        doubleSide: false, 
+        orientation:"PORTRAIT",
+        pagesRange:"ALL",
+        pagesCustomValue :""
       }));
 
     setFiles(prev => [...prev, ...validFiles]);
@@ -45,10 +48,10 @@ export default function PrintLoader() {
   }
 
   return (
-    <div className="max-w-xl space-y-4 ">
+    <div className={`max-w-xl space-y-4  px-3   ${files.length==0?"flex justify-center items-center h-screen":""}`} >
 
       {/* Upload Box */}
-      <label className=" rounded-lg p-5 text-center cursor-pointer">
+      <label className=" rounded-lg p-5 text-center cursor-pointer ">
         <input
           type="file"
           multiple
@@ -56,24 +59,27 @@ export default function PrintLoader() {
           className="hidden"
           onChange={handleFiles}
         />
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 bg-blue-400 px-3 py-3 rounded-xl text-white">
           Upload PDF or DOCX files
         </p>
       </label>
 
       {/* File Cards */}
       {files.map((item, index) => (
-        <FIleCard item={item} key={index} update={update} removeFile={removeFile} index={index}/>
+        <FileCard item={item} key={index} update={update} removeFile={removeFile} index={index}/>
       ))}
 
 
 
-      <button className="px-3 py-3 w-full bg-green-500 rounded-2xl mt-3 text-white font-bold cursor-pointer"  onClick={calculateAmount}>
+    {files.length>0?  <button className="px-3 py-3 my-6 w-full bg-green-500 rounded-2xl mt-3 text-white font-bold cursor-pointer"  onClick={calculateAmount}>
         Calculate Amount
       </button>
+      
+    :""}
+
     </div>
 
 
-
+    
   );
 }
