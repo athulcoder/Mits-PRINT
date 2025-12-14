@@ -1,19 +1,14 @@
-// middleware.ts
+// middleware.js
 import { withAuth } from "next-auth/middleware";
 
 export default withAuth({
-  pages: {
-    signIn: "/login",
+  callbacks: {
+    authorized: ({ token }) => !!token,
   },
 });
+
 export const config = {
   matcher: [
-    /*
-     * Protect everything except:
-     * - /login
-     * - /api/auth
-     * - static files
-     */
     "/((?!login|api/auth|_next|favicon.ico|api/file).*)",
   ],
 };
