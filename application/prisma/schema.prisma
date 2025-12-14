@@ -40,6 +40,12 @@ enum PaymentStatus {
   PRINTING
 }
 
+enum PrintRange {
+  ALL
+  EVEN
+  ODD
+  CUSTOM
+}
 
 
 
@@ -110,8 +116,9 @@ model Print {
   orientation Orientation @default(PORTRAIT)
   printOnBothSides Boolean @default(false)
   status PrintStatus @default(PENDING)
-  pageRange String? 
 
+  pageRange PrintRange @default(ALL)
+  customRange String? 
 
   orderId String
   verification Order @relation(fields: [orderId], references: [id])
