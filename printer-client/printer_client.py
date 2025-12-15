@@ -4,7 +4,7 @@ from datetime import datetime
 
 # ================= CONFIG =================
 ORDERS_API_URL = "https://mits-print-five.vercel.app/api/file?SECRET_KEY=mitsprint123456789"
-DOWNLOAD_DIR = "downloads"
+DOWNLOAD_DIR = "PRINT"
 TIMEOUT = 30
 # =========================================
 
