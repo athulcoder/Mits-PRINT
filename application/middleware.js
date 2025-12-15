@@ -10,6 +10,7 @@ export async function middleware(req) {
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico" ||
+    pathname === "/college_logo.png" ||
     pathname === "/api/file" 
 
   ) {
@@ -20,7 +21,6 @@ export async function middleware(req) {
     req,
     secret: process.env.NEXTAUTH_SECRET,
   });
-  console.log(token)
 
 if (!token) {
   return NextResponse.redirect(new URL("/login", req.url));
