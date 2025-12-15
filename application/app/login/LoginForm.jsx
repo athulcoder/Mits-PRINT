@@ -1,7 +1,6 @@
 
 "use client"
 import {signIn} from "next-auth/react"
-import { redirect } from 'next/navigation';
 import Image from 'next/image'
 import React, { useState } from 'react'
 import DotLoader from "../../components/DotLoader";
@@ -20,7 +19,8 @@ const LoginForm = () => {
     const res = await signIn("credentials", {
       email: form.email.value,
       password: form.password.value,
-      redirect: false,
+      redirect:false,
+      callbackUrl: '/',
     });
 
     if (res?.error) {
@@ -28,7 +28,10 @@ const LoginForm = () => {
       setLoad(false);
     } else {
         setLoad(false)
+        window.location.href = res.url ?? "/";
+
     }
+
   }
 
 
