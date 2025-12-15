@@ -21,11 +21,10 @@ export async function middleware(req) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  // if (!token) {
-  //   const loginUrl = new URL("/login", req.url);
-  //   loginUrl.searchParams.set("callbackUrl", req.url);
-  //   return NextResponse.redirect(loginUrl);
-  // }
+if (!token) {
+  return NextResponse.redirect(new URL("/login", req.url));
+}
+
 
   return NextResponse.next();
 }     
