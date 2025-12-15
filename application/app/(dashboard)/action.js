@@ -70,8 +70,8 @@ export async function calculateAmountServer(files){
             }
         }
     })
-    
-    totalCost += 150 //extra page
+
+    totalCost += 200 //extra page
 
     return totalCost
 
