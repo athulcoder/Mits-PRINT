@@ -2,6 +2,7 @@
 import { useState } from "react";
 import FileCard from "./FIleCard";
 import PaymentBox from "./PaymentBox";
+import Footer from "./Footer";
 
 export default function PrintLoader() {
   const [files, setFiles] = useState([]);
@@ -82,6 +83,8 @@ export default function PrintLoader() {
       </button>
       
     :""}
+
+            
 
     </div>
 

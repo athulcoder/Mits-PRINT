@@ -10,8 +10,8 @@ export default function Layout({ children }) {
     <div className="bg-[#f2f2f2] min-h-screen w-full">
       <Navbar />
       {children}
-      <Footer />
     </div>
+
       </Providers>
   );
 }

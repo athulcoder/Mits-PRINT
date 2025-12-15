@@ -12,7 +12,7 @@ const FileCard = ({item, update, removeFile, index}) => {
   return (
    <div
      
-          className=" rounded-lg p-4 space-y-3 bg-white  min-w-[90%] h-[200px]"
+          className=" rounded-xl p-4 space-y-3 bg-white  min-w-[90%] h-fit shadow-sm"
         >
           <div className="font-medium truncate">
             {item.file.name}
