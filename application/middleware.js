@@ -4,9 +4,8 @@ import { NextResponse } from "next/server";
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
 
-  // 🔓 Public routes (VERY IMPORTANT)
+ 
   if (
-    pathname === "/login" ||
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico" ||
@@ -15,7 +14,7 @@ export async function middleware(req) {
   ) {
     return NextResponse.next();
   }
-
+  
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
