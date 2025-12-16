@@ -27,7 +27,7 @@ export  async function createOrder(items){
           printOnBothSides: item.doubleSide,
           copies: item.copies,
           orientation: item.orientation,
-          pagesRange: item.pagesRange,
+          pageRange: item.pagesRange,
           customRange: item.customRange,
         })),
       },
