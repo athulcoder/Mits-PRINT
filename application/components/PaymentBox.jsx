@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FaIndianRupeeSign } from "react-icons/fa6";
 import { handleCancel, payMoney } from "../app/(dashboard)/action";
+import { redirect } from "next/navigation";
 
 export default function PaymentBox({ open, onClose, amount, files }) {
   const [loading, setLoading] = useState(false);
@@ -20,14 +21,13 @@ export default function PaymentBox({ open, onClose, amount, files }) {
 
     if(data.success){
       alert(data.message);
-
     }
     else{
       alert("Something went wrong!!!!")
-
     }
-
     onClose()
+    window.location.href='/'
+   
     
 
 

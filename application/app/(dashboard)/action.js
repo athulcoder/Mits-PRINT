@@ -77,30 +77,69 @@ export async function calculateAmountServer(files){
 
 export  async function payMoney(files) {
 
+
+    const dataWithOutFILE = files.map(({ file, ...rest }) => rest);
+
+    const filesOnly = files.map(file=>file.file)
+    const uploadUrls = await uploadToGCS(filesOnly);
+  
+    const metadata = dataWithOutFILE.map((item,index)=>({
+        ...item,
+        fileUrl:uploadUrls[index]
+    }))
+
+    const formData = new FormData();
+     metadata.forEach(item => {
+    formData.append("metadata", JSON.stringify(item));
+    });
+
+
+    const res = await fetch('/api/upload', {
+        method:"POST",
+        body:formData
+    })
+
+    const data = await res.json();
+
+    return data;
+}
+
+
+
+
+
+export async function uploadToGCS(files){
+
+console.log(files)
 const formData = new FormData();
 
-// 1️⃣ Extract metadata (WITHOUT files)
-const metadata = files.map(({ file, ...rest }) => rest);
 
-// 2️⃣ Append metadata as JSON string
-formData.append('items', JSON.stringify(metadata));
-
-// 3️⃣ Append files in SAME ORDER
-files.forEach((item) => {
-  formData.append('files', item.file);
+//adding all files array to formData with key files
+files.forEach(file => {
+  formData.append("files", file);
 });
 
 
- const res = await fetch('/api/upload', {
-  method: 'POST',
-  body: formData,
-});
+console.log('Hi', formData.getAll('files'))
+
+     const res = await fetch('/api/uploader', {
+    method: 'POST',
+    body: formData,
+    });
 
 
-const data = await res.json();
+    const { uploads } = await res.json();
 
-return data
+  // 2️⃣ Upload files directly to GCS
+    await Promise.all(
+        uploads.map((u, i) =>
+        fetch(u.uploadUrl, {
+            method: "PUT",
+            headers: { "Content-Type": files[i].type },
+            body: files[i],
+        })
+        )
+    );
 
-
-  
-}
+  return uploads.map(u => u.fileUrl);
+    }
