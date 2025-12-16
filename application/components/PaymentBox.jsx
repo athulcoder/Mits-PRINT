@@ -23,7 +23,7 @@ export default function PaymentBox({ open, onClose, amount, files }) {
 
     }
     else{
-      alert("Something went wrong")
+      alert("Something went wrong!!!!")
 
     }
 
