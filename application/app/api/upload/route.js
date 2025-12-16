@@ -57,7 +57,7 @@ export async function POST(req) {
 
 
   return NextResponse.json({
-    success: true,
-    data: enrichedItems,
+    success:true,
+    message:"Files sent to mits store PC "
   });
 }

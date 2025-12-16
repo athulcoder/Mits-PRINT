@@ -91,11 +91,15 @@ files.forEach((item) => {
 });
 
 
- await fetch('/api/upload', {
+ const res = await fetch('/api/upload', {
   method: 'POST',
   body: formData,
 });
 
+
+const data = await res.json();
+
+return data
 
 
   

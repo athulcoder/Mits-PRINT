@@ -14,14 +14,21 @@ export default function PaymentBox({ open, onClose, amount, files }) {
 
     // simulate payment / call Razorpay here
   
-    const res = await payMoney(files);
+    const data = await payMoney(files);
 
     setLoading(false)
 
-    // if(data.success){
-    //   alert('Uploaded to server');
+    if(data.success){
+      alert(data.message);
 
-    // }
+    }
+    else{
+      alert("Something went wrong")
+
+    }
+
+    onClose()
+    
 
 
   }
