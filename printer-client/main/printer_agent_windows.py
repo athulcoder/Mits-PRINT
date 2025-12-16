@@ -6,7 +6,7 @@ import time
 import os
 from urllib.parse import urlparse
 
-SERVER_URL = "https://www.example.com/api/print-queue"
+SERVER_URL = "https://www.example.com/api/print-queue this is not real"
 POLL_INTERVAL = 5
 
 EPSON_PRINTER = "Epson_L3110"
