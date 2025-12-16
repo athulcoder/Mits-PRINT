@@ -1,25 +1,46 @@
-import requests
-import win32print
-import win32api
-import win32con
-import time
 import os
-from urllib.parse import urlparse
+import time
+import json
+import requests
+import subprocess
+import hashlib
 
-SERVER_URL = "https://www.example.com/api/print-queue this is not real"
-POLL_INTERVAL = 5
+# ================= CONFIG =================
 
-EPSON_PRINTER = "Epson_L3110"
-XEROX_PRINTER = "Xerox_WorkCentre_5335"
+API_URL = "https://mitsprint.vercel.app/api/file?SECRET_KEY=mitsprint123456789"
+CHECK_INTERVAL = 30  # seconds
 
-DOWNLOAD_DIR = "C:\\print_jobs"
+DOWNLOAD_DIR = "downloads"
+PRINTED_LOG = "printed.log"
+
+EPSON_PRINTER_NAME = "EPSON"
+XEROX_PRINTER_NAME = "XEROX"
+
+# ==========================================
+
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 
-def download_pdf(url):
-    filename = os.path.basename(urlparse(url).path)
+def already_printed(print_id: str) -> bool:
+    if not os.path.exists(PRINTED_LOG):
+        return False
+    with open(PRINTED_LOG, "r") as f:
+        return print_id in f.read()
+
+
+def mark_as_printed(print_id: str):
+    with open(PRINTED_LOG, "a") as f:
+        f.write(print_id + "\n")
+
+
+def download_pdf(url: str) -> str:
+    filename = hashlib.md5(url.encode()).hexdigest() + ".pdf"
     path = os.path.join(DOWNLOAD_DIR, filename)
 
+    if os.path.exists(path):
+        return path
+
+    print(f"[↓] Downloading PDF")
     r = requests.get(url, timeout=30)
     r.raise_for_status()
 
@@ -29,94 +50,79 @@ def download_pdf(url):
     return path
 
 
-def choose_printer(job):
-    if job["colorMode"] == "COLOR":
-        return EPSON_PRINTER
-    return XEROX_PRINTER
+def print_pdf_windows(
+    pdf_path: str,
+    printer: str,
+    copies: int,
+    duplex: bool
+):
+    duplex_flag = "duplex" if duplex else "simplex"
 
-
-def configure_printer(printer_name, job):
-    hPrinter = win32print.OpenPrinter(printer_name)
-    try:
-        properties = win32print.GetPrinter(hPrinter, 2)
-        devmode = properties["pDevMode"]
-
-        # Copies
-        devmode.Copies = job["copies"]
-
-        # Orientation
-        devmode.Orientation = (
-            win32con.DMORIENT_LANDSCAPE
-            if job["orientation"] == "LANDSCAPE"
-            else win32con.DMORIENT_PORTRAIT
+    for _ in range(copies):
+        subprocess.run(
+            [
+                "powershell",
+                "-Command",
+                f'Start-Process -FilePath "{pdf_path}" '
+                f'-Verb Print '
+                f'-ArgumentList \'/d:"{printer}"\''
+            ],
+            shell=True
         )
-
-        # Duplex
-        if printer_name == XEROX_PRINTER and job["printOnBothSides"]:
-            devmode.Duplex = win32con.DMDUP_VERTICAL
-        else:
-            devmode.Duplex = win32con.DMDUP_SIMPLEX
-
-        # Color
-        if printer_name == XEROX_PRINTER:
-            devmode.Color = win32con.DMCOLOR_MONOCHROME
-        else:
-            devmode.Color = win32con.DMCOLOR_COLOR
-
-        win32print.SetPrinter(hPrinter, 2, properties, 0)
-    finally:
-        win32print.ClosePrinter(hPrinter)
+        time.sleep(2)
 
 
-def print_pdf(file_path, printer_name):
-    win32api.ShellExecute(
-        0,
-        "printto",
-        file_path,
-        f'"{printer_name}"',
-        ".",
-        0
-    )
+def handle_print_job(job: dict):
+    print_id = job["id"]
+
+    if already_printed(print_id):
+        return
+
+    file_url = job["fileUrl"]
+    copies = job.get("copies", 1)
+    color = job.get("colorMode", "BLACK_WHITE")
+    duplex = job.get("printOnBothSides", False)
+
+    # ===== PRINTER SELECTION =====
+    if color == "COLOR":
+        printer = EPSON_PRINTER_NAME
+        duplex = False
+    else:
+        printer = XEROX_PRINTER_NAME
+
+    pdf_path = download_pdf(file_url)
+
+    print(f"[🖨] Printing {print_id} on {printer}")
+    print_pdf_windows(pdf_path, printer, copies, duplex)
+
+    mark_as_printed(print_id)
+    print(f"[✓] Completed {print_id}")
 
 
-def process_print_job(job):
-    printer = choose_printer(job)
-    pdf_path = download_pdf(job["fileUrl"])
+def poll_server():
+    print("🖨 Printer Agent Started (Windows)")
+    print("---------------------------------")
 
-    print(f"[→] Sending {pdf_path} to {printer}")
-    configure_printer(printer, job)
-    print_pdf(pdf_path, printer)
-    print("[✓] Print triggered")
-
-
-def fetch_orders():
-    r = requests.get(SERVER_URL, timeout=10)
-    r.raise_for_status()
-    return r.json()["orders"]
-
-
-def main():
-    print("🖨️ Windows Print Agent started")
     while True:
         try:
-            orders = fetch_orders()
+            r = requests.get(API_URL, timeout=20)
+            r.raise_for_status()
+            payload = r.json()
 
-            for order in orders:
-                for job in order["prints"]:
-                    if job["status"] != "PENDING":
-                        continue
+            if not payload.get("success"):
+                time.sleep(CHECK_INTERVAL)
+                continue
 
-                    process_print_job(job)
-
-                    # OPTIONAL: update status
-                    # requests.post("https://www.example.com/api/update-status",
-                    #               json={"printId": job["id"], "status": "SUCCESS"})
+            for order in payload.get("data", []):
+                for job in order.get("prints", []):
+                    if job.get("status") == "PENDING":
+                        handle_print_job(job)
 
         except Exception as e:
-            print("⚠️ Error:", e)
+            print("[ERROR]", e)
 
-        time.sleep(POLL_INTERVAL)
+        time.sleep(CHECK_INTERVAL)
 
 
 if __name__ == "__main__":
-    main()
+    poll_server()
