@@ -71,3 +71,32 @@ export async function calculateAmountServer(files){
     return totalCost
 
 }
+
+
+
+
+export  async function payMoney(files) {
+
+const formData = new FormData();
+
+// 1️⃣ Extract metadata (WITHOUT files)
+const metadata = files.map(({ file, ...rest }) => rest);
+
+// 2️⃣ Append metadata as JSON string
+formData.append('items', JSON.stringify(metadata));
+
+// 3️⃣ Append files in SAME ORDER
+files.forEach((item) => {
+  formData.append('files', item.file);
+});
+
+
+ await fetch('/api/upload', {
+  method: 'POST',
+  body: formData,
+});
+
+
+
+  
+}

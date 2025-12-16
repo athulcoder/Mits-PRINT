@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { FaIndianRupeeSign } from "react-icons/fa6";
-import { handleCancel } from "../app/(dashboard)/action";
+import { handleCancel, payMoney } from "../app/(dashboard)/action";
 
-export default function PaymentBox({ open, onClose, amount }) {
+export default function PaymentBox({ open, onClose, amount, files }) {
   const [loading, setLoading] = useState(false);
 
   if (!open) return null;
@@ -13,11 +13,18 @@ export default function PaymentBox({ open, onClose, amount }) {
     setLoading(true);
 
     // simulate payment / call Razorpay here
-    setTimeout(() => {
-      setLoading(false);
-      // success flow here
-    }, 2000);
-  };
+  
+    const res = await payMoney(files);
+
+    setLoading(false)
+
+    // if(data.success){
+    //   alert('Uploaded to server');
+
+    // }
+
+
+  }
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
@@ -57,7 +64,7 @@ export default function PaymentBox({ open, onClose, amount }) {
               </button>
 
               <button
-                onClick={() => handleCancel(onClose)}
+                onClick={() =>onclose}
                 className="h-11 rounded-xl border border-gray-300 text-lg
                            text-gray-700 hover:bg-gray-100 transition"
               >

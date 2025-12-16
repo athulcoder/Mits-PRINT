@@ -2,7 +2,7 @@
 import { useState } from "react";
 import FileCard from "./FIleCard";
 import PaymentBox from "./PaymentBox";
-import { calculateAmountServer } from "../app/(dashboard)/action";
+import { calculateAmountServer, payMoney } from "../app/(dashboard)/action";
 
 export default function PrintLoader() {
   const [files, setFiles] = useState([]);
@@ -12,7 +12,13 @@ export default function PrintLoader() {
 
 
 
+
+
   async function  calculateAmount(){
+
+    // DEBUGGER
+    console.log(files)
+
     setShowPayBox(true)
      const a =  await calculateAmountServer(files)
       setAmount(a)
@@ -60,7 +66,7 @@ export default function PrintLoader() {
     <div className={`max-w-xl space-y-4  px-3 w-full  ${files.length==0?"flex justify-center items-center h-screen":""}`} >
 
 
-      <PaymentBox open={showPayBox} onClose={()=>setShowPayBox(false) } amount={amount}></PaymentBox>
+      <PaymentBox open={showPayBox} onClose={()=>setShowPayBox(false) } amount={amount} files={files}></PaymentBox>
 
       {/* Upload Box */}
       <label className=" rounded-lg p-5 text-center cursor-pointer ">
@@ -97,3 +103,5 @@ export default function PrintLoader() {
     
   );
 }
+
+

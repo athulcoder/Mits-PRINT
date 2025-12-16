@@ -4,7 +4,7 @@ import { prisma } from "../../../../lib/prisma";
 
 const TWO_WEEKS = 60 * 60 * 24 * 14;
 
-const handler = NextAuth({
+export const authOptions = {
 
   providers: [
     Credentials({
@@ -21,6 +21,7 @@ const handler = NextAuth({
 
         //here we are assuming the students password is not hashed
 
+        
        const student = await prisma.student.findUnique({
         where:{email:credentials.email, password:credentials.password} })  
 
@@ -46,7 +47,8 @@ const handler = NextAuth({
   pages: {
     signIn: "/login",
   },
-});
+}
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
 

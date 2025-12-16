@@ -121,7 +121,7 @@ model Print {
   customRange String? 
 
   orderId String
-  verification Order @relation(fields: [orderId], references: [id])
+  order Order @relation(fields: [orderId], references: [id])
 
   createdAt DateTime @default(now())
   
