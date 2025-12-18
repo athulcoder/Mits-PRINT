@@ -3,8 +3,13 @@ import requests
 import subprocess
 from pathlib import Path
 from collections import deque
+from dotenv import load_dotenv
+import os
 
-API_URL = "https://mitsprint.vercel.app/api/file?SECRET_KEY=mitsprint123456789"
+
+load_dotenv() 
+API_URL = os.getenv("API_URL")
+
 CHECK_INTERVAL = 5  # seconds
 
 BASE_DIR = Path("PRINT")
