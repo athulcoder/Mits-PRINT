@@ -1,34 +1,69 @@
 "use client";
 
+import { startUpload } from "../app/(dashboard)/action";
 import { useState } from "react";
 import { FaIndianRupeeSign } from "react-icons/fa6";
-import { handleCancel, payMoney } from "../app/(dashboard)/action";
-import { redirect } from "next/navigation";
+
 
 export default function PaymentBox({ open, onClose, amount, files }) {
   const [loading, setLoading] = useState(false);
 
   if (!open) return null;
 
-  const handlePay = async () => {
-    setLoading(true);
+    const loadRazorpay = async () => {
+    const res = await fetch("/api/orders", { method: "POST",body:JSON.stringify({amount:amount}) });
+    const order = await res.json();
 
-    // simulate payment / call Razorpay here
-  
-    const data = await payMoney(files);
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "MITS PRINT",
+      order_id: order.id,
+      handler: async function (response) {
+            const res = await fetch("/api/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(response),
+          });
 
-    setLoading(false)
+          const d = await res.json();
 
-    if(data.success){
-      alert(data.message);
-    }
-    else{
-      alert("Something went wrong!!!!")
-    }
-    onClose()
-    window.location.href='/'
-   
+            if (d.success) {
+
+            //show screen
+              setLoading(true);
+            const data = await startUpload(files);
+
+            if(data.success){
+              alert(data.message);
+            }
+            else{
+              alert("Something went wrong!!!!")
+            }
+            setLoading(false)
+            console.log(data);
+            window.location.href=`/myprints?order_id=${data.orderId}`
     
+            } 
+            else {
+              alert("Payment verification failed");
+            }
+    },
+
+      theme: { color: "#3399cc" },
+    };
+  const rzp = new (window).Razorpay(options);
+    rzp.open();
+  }
+
+    const handlePay = async () => {
+
+        
+  
+      loadRazorpay()
+  
+
 
 
   }
@@ -46,7 +81,7 @@ export default function PaymentBox({ open, onClose, amount, files }) {
         {loading ? (
           <div className="flex h-[220px] flex-col items-center justify-center">
             <span className="text-lg font-medium text-gray-700">
-              Processing payment…
+               Sending this file to MITS STORE PC Please wait .....
             </span>
             <span className="mt-2 text-sm text-gray-400">
               Please do not close this window
@@ -71,7 +106,7 @@ export default function PaymentBox({ open, onClose, amount, files }) {
               </button>
 
               <button
-                onClick={() =>onclose}
+                onClick={onClose}
                 className="h-11 rounded-xl border border-gray-300 text-lg
                            text-gray-700 hover:bg-gray-100 transition"
               >
@@ -80,8 +115,10 @@ export default function PaymentBox({ open, onClose, amount, files }) {
             </div>
           </>
         )}
+        
 
       </div>
     </div>
   );
 }
+
