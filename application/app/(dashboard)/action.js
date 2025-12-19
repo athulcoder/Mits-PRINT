@@ -75,7 +75,7 @@ export async function calculateAmountServer(files){
 
 
 
-export  async function payMoney(files) {
+export  async function startUpload(files) {
 
 
     const dataWithOutFILE = files.map(({ file, ...rest }) => rest);
@@ -98,6 +98,7 @@ export  async function payMoney(files) {
         method:"POST",
         body:formData
     })
+
 
     const data = await res.json();
 
