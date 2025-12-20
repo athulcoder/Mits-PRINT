@@ -11,9 +11,7 @@ export default function PrintLoader() {
   const [amount , setAmount] = useState("");
 
 
-
-
-
+  
   async function  calculateAmount(){
 
     // DEBUGGER
