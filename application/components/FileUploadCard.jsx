@@ -11,7 +11,7 @@ export default function PrintLoader() {
   const [amount , setAmount] = useState("");
 
 
-  
+
   async function  calculateAmount(){
 
     // DEBUGGER
@@ -22,6 +22,7 @@ export default function PrintLoader() {
       setAmount(a)
      
   }
+
 
   const allowedTypes = [
     "application/pdf",
@@ -71,12 +72,12 @@ export default function PrintLoader() {
         <input
           type="file"
           multiple
-          accept=".pdf,.docx"
+          accept=".pdf"
           className="hidden"
           onChange={handleFiles}
         />
         <p className="text-sm  bg-green-400 px-3 py-3 rounded-xl text-white">
-          Upload PDF or DOCX files
+          Upload PDF  files
         </p>
       </label>
 
