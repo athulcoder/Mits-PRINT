@@ -115,7 +115,7 @@ export default function PaymentBox({ open, onClose, amount, files }) {
                 className="h-11 rounded-xl bg-green-600 text-lg font-medium text-white
                            hover:bg-green-700 transition"
               >
-                Pay Now
+                Procced
               </button>
 
               <button
