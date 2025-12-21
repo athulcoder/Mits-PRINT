@@ -102,6 +102,17 @@ async function calculateAmount() {
     {files.length > 0 && (
       <div className="space-y-4 mt-4">
 
+        
+
+        {files.map((item, index) => (
+          <FileCard
+            key={index}
+            item={item}
+            index={index}
+            update={update}
+            removeFile={removeFile}
+          />
+        ))}
         <label className="cursor-pointer block">
           <input
             type="file"
@@ -114,17 +125,6 @@ async function calculateAmount() {
             + Add more files
           </div>
         </label>
-
-        {files.map((item, index) => (
-          <FileCard
-            key={index}
-            item={item}
-            index={index}
-            update={update}
-            removeFile={removeFile}
-          />
-        ))}
-
         <button
           disabled={isCalculating}
           onClick={calculateAmount}
