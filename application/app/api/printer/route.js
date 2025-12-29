@@ -1,3 +1,4 @@
+import { updatePrinterStatus } from "../../../services/printer.service";
 import { NextResponse } from "next/server";
 
 export async function POST(req){
@@ -14,11 +15,15 @@ export async function POST(req){
         throw e
     }
 
-    const {printerId , printerStatus , printerReason} =body;
+    const res = await updatePrinterStatus(body)
 
-    return NextResponse.json({message:"U are a super user" , printerId, printerStatus,printerReason})
+    if(!res)
+        return NextResponse.json({message:"Updation failed"})
+    
+    
+    return NextResponse.json({message:"Updation Successfull", updationStatus: true})
 
-
+    
     }catch(error){
         
         return NextResponse.json({message:"unexpected error occured "});
