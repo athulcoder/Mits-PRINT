@@ -1,7 +1,6 @@
 import time
 import requests
 import subprocess
-import cups
 from pathlib import Path
 from collections import deque
 
@@ -10,10 +9,9 @@ from collections import deque
 API_URL = "https://mitsprint.vercel.app/api/file?SECRET_KEY=mitsprint123456789"
 ERROR_REPORT_URL = "https://xyz.com/printer-error"
 
-PRINTER_NAME = "Xerox"   # EXACT name from lpstat -p
-CHECK_INTERVAL = 5       # seconds
-
-TEST_MODE_HOLD_QUEUE = True  # keeps jobs visible in lpq
+PRINTER_NAME = "Xerox"      # EXACT name from: lpstat -p
+CHECK_INTERVAL = 5          # seconds
+TEST_MODE_HOLD_QUEUE = True # keep jobs in lpq
 
 BASE_DIR = Path("PRINT")
 COLOR_DIR = BASE_DIR / "COLOR"
@@ -25,7 +23,6 @@ BASE_DIR.mkdir(exist_ok=True)
 COLOR_DIR.mkdir(exist_ok=True)
 BW_DIR.mkdir(exist_ok=True)
 
-cups_conn = cups.Connection()
 print_queue = deque()
 seen_print_ids = set()
 last_reported_error = None
@@ -37,17 +34,12 @@ def fetch_raw_response():
     r.raise_for_status()
     return r.json()
 
-
 def extract_orders(response):
     if isinstance(response, list):
         return response
     if isinstance(response, dict):
-        if isinstance(response.get("data"), list):
-            return response["data"]
-        if isinstance(response.get("orders"), list):
-            return response["orders"]
+        return response.get("data") or response.get("orders") or []
     return []
-
 
 # ================= QUEUE =================
 
@@ -56,7 +48,6 @@ def enqueue_jobs(orders):
 
     for order in orders:
         for p in order.get("prints", []):
-
             pid = p.get("id")
             url = p.get("fileUrl")
             color = p.get("colorMode")
@@ -66,7 +57,7 @@ def enqueue_jobs(orders):
             if status != "PENDING":
                 continue
 
-            if not pid or not url or not color:
+            if not pid or not url:
                 continue
 
             if pid in seen_print_ids:
@@ -87,49 +78,59 @@ def enqueue_jobs(orders):
             print(f"[+] Queued {pid} | copies={copies}")
 
     if added == 0:
-        print("[i] No new printable jobs")
+        print("[i] No new jobs")
 
+# ================= PRINTER STATUS =================
 
-# ================= PRINTER DRIVER =================
+'''def get_printer_error():
+    try:
+        result = subprocess.check_output(
+            ["lpstat", "-p", PRINTER_NAME],
+            stderr=subprocess.STDOUT,
+            text=True
+        ).lower()
 
-def get_printer_error():
-    printers = cups_conn.getPrinters()
+        if "disabled" in result:
+            return "PRINTER_DISABLED"
+        if "paused" in result:
+            return "PRINTER_PAUSED"
+        if "offline" in result:
+            return "PRINTER_OFFLINE"
 
-    if PRINTER_NAME not in printers:
+    except subprocess.CalledProcessError as e:
         return "PRINTER_NOT_FOUND"
 
-    printer = printers[PRINTER_NAME]
-    state = printer.get("printer-state")
-    reasons = printer.get("printer-state-reasons", [])
+    try:
+        jobs = subprocess.check_output(
+            ["lpstat", "-o", PRINTER_NAME],
+            stderr=subprocess.STDOUT,
+            text=True
+        ).lower()
 
-    # state 5 = stopped
-    if state == 5:
-        return ", ".join(reasons)
+        if "media-empty" in jobs:
+            return "OUT_OF_PAPER"
+        if "jam" in jobs:
+            return "PAPER_JAM"
+        if "door-open" in jobs:
+            return "DOOR_OPEN"
 
-    error_reasons = [
-        r for r in reasons
-        if r not in ("none", "printer-idle", "job-printing")
-    ]
+    except subprocess.CalledProcessError:
+        pass
 
-    if error_reasons:
-        return ", ".join(error_reasons)
+    return None'''
 
-    return None
-
-
-def report_printer_error(error_msg):
+'''def report_printer_error(error):
     payload = {
         "printer": PRINTER_NAME,
-        "error": error_msg,
+        "error": error,
         "timestamp": int(time.time())
     }
 
     try:
         requests.post(ERROR_REPORT_URL, json=payload, timeout=10)
-        print(f"[!] Error forwarded → {error_msg}")
+        print(f"[!] Error forwarded → {error}")
     except Exception as e:
-        print("[ERROR] Failed to report error:", e)
-
+        print("[ERROR] Failed to forward error:", e)
 
 def monitor_printer_errors():
     global last_reported_error
@@ -141,8 +142,7 @@ def monitor_printer_errors():
         last_reported_error = error
 
     if error is None:
-        last_reported_error = None
-
+        last_reported_error = None'''
 
 # ================= PRINT =================
 
@@ -153,7 +153,6 @@ def download_pdf(url, path):
     r = requests.get(url, timeout=30)
     r.raise_for_status()
     path.write_bytes(r.content)
-
 
 def print_job(job):
     print(f"[-] Printing {job['id']} | copies={job['copies']}")
@@ -170,8 +169,7 @@ def print_job(job):
     cmd.append(str(job["path"]))
 
     subprocess.run(cmd, check=True)
-    print(f"[✓] Job sent to CUPS → {job['id']}")
-
+    print(f"[✓] Sent to printer → {job['id']}")
 
 def process_queue():
     if not print_queue:
@@ -181,22 +179,21 @@ def process_queue():
     download_pdf(job["url"], job["path"])
     print_job(job)
 
-
 # ================= MAIN =================
 
 def main():
-    print("🖨️ Xerox Print Queue Agent")
+    print("🖨️ Xerox Print Agent (Driver-safe)")
     print("====================================")
-    print("→ Driver-aware | Error forwarding ON")
-    print("→ FIFO queue | Copies respected\n")
+    print("→ No python-cups")
+    print("→ Uses CUPS CLI")
+    print("→ Error forwarding enabled\n")
 
     while True:
         try:
             monitor_printer_errors()
 
-            error = get_printer_error()
-            if error:
-                print(f"[!] Printer error active: {error}")
+            if get_printer_error():
+                print("[!] Printer error active — queue paused")
                 time.sleep(CHECK_INTERVAL)
                 continue
 
@@ -215,7 +212,6 @@ def main():
         except Exception as e:
             print("[ERROR]", e)
             time.sleep(CHECK_INTERVAL)
-
 
 if __name__ == "__main__":
     main()
