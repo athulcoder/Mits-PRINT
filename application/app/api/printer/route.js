@@ -11,6 +11,9 @@ export async function POST(req){
     if(SECRET_KEY != process.env.SECRET_KEY){
         return NextResponse.json({message:"YOU ARE NOT AUTH TO GET THIS"})
     }
+
+
+    return NextResponse.json({message:"U are a super user"})
     }catch(error){
         
         return NextResponse.json({message:"unexpected error occured "});
