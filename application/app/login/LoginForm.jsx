@@ -52,7 +52,7 @@ const LoginForm = () => {
         <div className='w-full flex justify-center items-center h-[70%] min-lg:w-[60%] min-lg:h-full'>
 
 
-        <form onSubmit={handleSubmit} className='w-[90%] max-w-[600px] h-[380px] bg-secondary-color shadow-gray-400 shadow-lg rounded-2xl py-6 flex flex-col '>
+        <form onSubmit={handleSubmit} className='w-[90%] max-w-[660px] h-[400px] bg-secondary-color shadow-gray-400 shadow-lg rounded-2xl py-6 flex flex-col '>
 
             
             <span className='text-2xl text-center w-full text-foreground font-semibold text-3xl'> Login</span>
@@ -68,8 +68,14 @@ const LoginForm = () => {
             <input type="password" className='border-1 border-gray-400 h-[50px] p-2 text-lg rounded-lg outline-0 focus:border-2 font focus:border-green-500' placeholder='password'  required name='password' autoComplete='current-password'/>
             </div>
 
+                <div className='flex items-center justify-end w-full px-6 '>
 
+                <p className="text-blue-400 font-serif cursor-pointer hover:text-blue-300" onClick={()=>window.location.href="/reset-password"}>Forgot password ?</p>
+
+                </div>
                 <p className="py-1 px-8 text-red-500 font-medium text-left h-[30px]">{"  "} {error}</p>
+
+              
         
             <div className='flex items-center justify-center w-full px-6 '>
                 <button type='submit' className='bg-green-600 text-white h-[50px] w-full cursor-pointer rounded-xl text-xl -semibold hover:bg-green-500  transition-all delay-75 flex justify-center items-center' > {load? <DotLoader/> :"Login"}</button>
