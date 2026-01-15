@@ -10,7 +10,7 @@ import PaymentBox from "../../components/PaymentBox";
 
 const Homepage = () => {
   
-  const [BW_PRINTER_STATUS, setBW_PRINTER_STATUS] = useState('OUT_OF_PAPER');
+  const [BW_PRINTER_STATUS, setBW_PRINTER_STATUS] = useState('READY');
   const [isCalculating, setIsCalculating] = useState(false);
   const [showPayBox , setShowPayBox] = useState(false);
   const [amount , setAmount] = useState("");
@@ -161,7 +161,7 @@ async function calculateAmount() {
 
 
 
-  return <section className='flex flex-col  items-center py-3 w-full  h-full  '>
+  return <section className='flex flex-col  items-center py-3 w-full  h-full px-4 '>
 
 
     {files.length > 0 && (
@@ -202,7 +202,7 @@ async function calculateAmount() {
         {/* PRINTER STATUS */}
         <PrinterStatus printer={printer}/>
          {BW_PRINTER_STATUS=='READY'&&<button
-          disabled={isCalculating&&files.every(file=>file.uploadStatus==="uploaded")}
+          disabled={isCalculating&&!files.every(file=>file.uploadStatus==="uploaded")}
           onClick={calculateAmount}
           className={`w-full py-3 rounded-2xl text-white font-bold transition flex justify-center items-center ${
             isCalculating
