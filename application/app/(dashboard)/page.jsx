@@ -17,9 +17,7 @@ const Homepage = () => {
   const [printer, setPrinter] = useState();
   const [files, setFiles] = useState([]);
 
-  useEffect(() => {
-    console.log(files);
-  }, [files]);
+
 
   useEffect(() => {
     const fetchPrinterStatus = async () => {
@@ -54,20 +52,27 @@ const Homepage = () => {
   async function handleFiles(e) {
 
     
-    
-    const selectedFiles = Array.from(e.target.files).filter((file) =>
+    // Files without any id
+    const choosedFiles = Array.from(e.target.files).filter((file) =>
       
       
          allowedTypes.includes(file.type) &&file.size<10000000
       
     );
 
+    // Files with id
+    const selectedFiles = choosedFiles.map(file=>(
+      {
+        file,
+        id:uuid()
+      }
+    ))
 
     if (selectedFiles.length === 0) return;
 
     // ---- PHASE 1: Optimistic UI (instant render) ----
-    const tempFiles = selectedFiles.map((file) => ({
-      id: uuid(),
+    const tempFiles = selectedFiles.map(({file,id}) => ({
+      id,
       file,
       uploadUrl: null,
       fileUrl: null,
@@ -87,61 +92,75 @@ const Homepage = () => {
     e.target.value = "";
 
     // ---- PHASE 2: Get signed URLs + upload ----
+
     try {
-      const urls = await getSignedUploadUrls(selectedFiles);
 
-      tempFiles.forEach((tempFile, i) => {
-        const { uploadUrl, fileUrl } = urls[i];
+      // get the needed things from the file
+      const fileMetaData = selectedFiles.map(({file,id})=>({
+        id,
+        type:file.type,
+        name:file.name,
+      }));
+      const urls = await getSignedUploadUrls(fileMetaData);
+      
 
-        // mark uploading + attach URLs
+      // First I need to create a Map hashmap with lookup O(1)
+        const urlMap = new Map(urls.map(u=>[u.id,u]));
+      
         setFiles((prev) =>
-          prev.map((f) =>
-            f.id === tempFile.id
-              ? {
-                  ...f,
-                  uploadUrl,
-                  fileUrl,
-                  uploadStatus: "uploading",
-                }
-              : f
-          )
-        );
+        prev.map((f) => {
+          const match = urlMap.get(f.id);
+          return match
+            ? {
+                ...f,
+                uploadUrl: match.uploadUrl,
+                fileUrl: match.fileUrl,
+                uploadStatus: "uploading",
+                uploadProgress: 0,
+              }
+            : f;
+        })
+      );
+    
 
-        uploadToGCS({
-          file: tempFile.file,
-          uploadUrl,
-          onProgress: (p) => {
-            setFiles((prev) =>
-              prev.map((f) =>
-                f.id === tempFile.id
-                  ? { ...f, uploadProgress: p }
-                  : f
-              )
-            );
-          },
-          onSuccess: () => {
-            setFiles((prev) =>
-              prev.map((f) =>
-                f.id === tempFile.id
-                  ? { ...f, uploadStatus: "uploaded", uploadProgress: 100 }
-                  : f
-              )
-            );
-          },
-          onError: () => {
-            setFiles((prev) =>
-              prev.map((f) =>
-                f.id === tempFile.id
-                  ? { ...f, uploadStatus: "error" }
-                  : f
-              )
-            );
-          },
-        });
-      });
-    } catch (err) {
-      console.error("Upload init failed", err);
-    }
+          tempFiles.forEach((tempFile) => {
+              const match = urlMap.get(tempFile.id);
+              if (!match) return;
+
+              uploadToGCS({
+                file: tempFile.file,
+                uploadUrl: match.uploadUrl,
+
+                onProgress: (p) => {
+                  setFiles((prev) =>
+                    prev.map((f) =>
+                      f.id === tempFile.id ? { ...f, uploadProgress: p } : f
+                    )
+                  );
+                },
+
+                onSuccess: () => {
+                  setFiles((prev) =>
+                    prev.map((f) =>
+                      f.id === tempFile.id
+                        ? { ...f, uploadStatus: "uploaded", uploadProgress: 100 }
+                        : f
+                    )
+                  );
+                },
+
+                onError: () => {
+                  setFiles((prev) =>
+                    prev.map((f) =>
+                      f.id === tempFile.id ? { ...f, uploadStatus: "error" } : f
+                    )
+                  );
+                },
+              });
+            });
+          } catch (err) {
+            console.error("Upload init failed", err);
+          }
   }
 
   function update(id, key, value) {
@@ -154,8 +173,7 @@ const Homepage = () => {
     setFiles((prev) => prev.filter((f) => f.id !== item.id));
     if (item.fileUrl) {
       await deleteFile(item.fileUrl);
-      console.log(item.file.name + " deleted");
-    }
+      }
   }
 
   return (

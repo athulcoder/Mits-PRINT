@@ -1,26 +1,22 @@
 import { NextResponse } from "next/server";
 import { bucket } from "../../../lib/gcs";
-import { randomUUID } from "crypto";
 
 
 export  async function POST(req){
 
-    const formData = await req.formData()
-    
-    const files = formData.getAll('files'); 
-    console.log(files+"HI")
-
-     if (!Array.isArray(files) || files.length === 0) {
+    const fileMetaData = await req.json();
+     if (!Array.isArray(fileMetaData) || fileMetaData.length === 0) {
     return NextResponse.json({ error: "Invalid files" }, { status: 400 });
   }
 
   const uploads = await Promise.all(
-    files.map(async ({ name, type }) => {
+    fileMetaData.map(async ({ id, type }) => {
+
       if (type !== "application/pdf") {
         throw new Error("Only PDF allowed");
       }
 
-    const fileName = `pdfs/${randomUUID()}.pdf`;
+    const fileName = `pdfs/${id}.pdf`;
      
 
       const file = bucket.file(fileName);
@@ -33,6 +29,7 @@ export  async function POST(req){
       });
 
       return {
+        id,
         uploadUrl,
         fileUrl: `https://storage.googleapis.com/${bucket.name}/${fileName}`,
       };
