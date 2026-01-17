@@ -9,7 +9,6 @@
     "lint": "eslint",
     "postinstall": "prisma generate"
   },
-  
   "engines": {
     "node": ">=20.19.0"
   },

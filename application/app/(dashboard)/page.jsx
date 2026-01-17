@@ -1,5 +1,5 @@
 "use client";
-
+import {v4 as uuid} from "uuid"
 import GreenSpinner from "../../components/CircleLoader";
 import { useEffect, useState } from "react";
 import { calculateAmountServer, getSignedUploadUrls } from "./action";
@@ -67,7 +67,7 @@ const Homepage = () => {
 
     // ---- PHASE 1: Optimistic UI (instant render) ----
     const tempFiles = selectedFiles.map((file) => ({
-      id: crypto.randomUUID(),
+      id: uuid(),
       file,
       uploadUrl: null,
       fileUrl: null,
