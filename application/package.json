@@ -20,6 +20,7 @@
     "bcrypt": "^6.0.0",
     "framer-motion": "^12.26.2",
     "lottie-react": "^2.4.1",
+    "lucide-react": "^0.562.0",
     "multer": "^2.0.2",
     "next": "16.0.10",
     "next-auth": "^4.24.13",

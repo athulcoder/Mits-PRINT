@@ -1,15 +1,16 @@
 "use client";
-import { RiLogoutCircleLine } from "react-icons/ri";
-import { navItems } from "../constants/navItem";
+import { LuLogOut } from "react-icons/lu";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { CiMenuBurger } from "react-icons/ci";
 import { TfiClose } from "react-icons/tfi";
+import Image from "next/image";
+import { navItems } from "../constants/navItem";
 const Navbar = () => {
   const { data: session, status } = useSession();
   
   return (
-    <div className="w-full bg-white h-[90px]  px-3 shadow-sm shadow-[#a8a8a8] min-lg:px-[200px] fixed top-0  flex flex-col justify-center">
+    <div className="w-full bg-white h-[90px]  px-3 shadow-sm shadow-[#e3e3e3] min-lg:px-[200px] fixed top-0  flex flex-col justify-center">
 
     <div className="flex justify-between items-center">
 
@@ -19,9 +20,11 @@ const Navbar = () => {
 
 
 
-      <span className="text-primary-color font-sans text-xl font-extrabold  justify-center items-center pl-1 ">
-     MITS PRINT
-      </span>
+      <div className="flex gap-3 justify-center items-center pl-2">
+        <h1 className="text-xl font-bold tracking-tight text-primary-black ">
+            MITS <span className="text-accent-red font-black ">PRINT</span>
+        </h1>
+      </div>
 
     
 
@@ -52,8 +55,8 @@ const Navbar = () => {
 
         {navItems.map(({label,url,icon:Icon})=>(
 
-          <li key={label} >
-            <Link href={url} className="flex gap-1 justify-center items-center text-gray-800 ">
+          <li key={label} className="">
+            <Link href={url} className="flex gap-1 justify-center items-center text-subtle-gray ">
             <Icon size={23} className="text-green-500"/>
             {label}
             </Link>
@@ -66,7 +69,7 @@ const Navbar = () => {
       </ul>
 
       <button onClick={()=>signOut()} className="flex justify-center items-center gap-1 cursor-pointer  rounded-2xl text-gray-700">
-       <RiLogoutCircleLine className="text-red-400" /> Logout
+       <LuLogOut className="text-accent-red font-bold"  /> Logout
       </button>
 
 

@@ -1,24 +1,44 @@
 import { NextResponse } from "next/server";
 import { bucket } from "../../../lib/gcs";
 
+export async function POST(req) {
+  let fileMetaData;
 
-export  async function POST(req){
+  try {
+    fileMetaData = await req.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid JSON body" },
+      { status: 400 }
+    );
+  }
 
-    const fileMetaData = await req.json();
-     if (!Array.isArray(fileMetaData) || fileMetaData.length === 0) {
-    return NextResponse.json({ error: "Invalid files" }, { status: 400 });
+  if (!Array.isArray(fileMetaData) || fileMetaData.length === 0) {
+    return NextResponse.json(
+      { error: "Invalid files array" },
+      { status: 400 }
+    );
+  }
+
+  for (const file of fileMetaData) {
+    if (!file.id || !file.type) {
+      return NextResponse.json(
+        { error: "Missing id or type" },
+        { status: 400 }
+      );
+    }
+
+    if (file.type !== "application/pdf") {
+      return NextResponse.json(
+        { error: "Only PDF allowed" },
+        { status: 400 }
+      );
+    }
   }
 
   const uploads = await Promise.all(
     fileMetaData.map(async ({ id, type }) => {
-
-      if (type !== "application/pdf") {
-        throw new Error("Only PDF allowed");
-      }
-
-    const fileName = `pdfs/${id}.pdf`;
-     
-
+      const fileName = `pdfs/${id}.pdf`;
       const file = bucket.file(fileName);
 
       const [uploadUrl] = await file.getSignedUrl({
@@ -35,8 +55,6 @@ export  async function POST(req){
       };
     })
   );
+
   return NextResponse.json({ uploads });
 }
-
-
-

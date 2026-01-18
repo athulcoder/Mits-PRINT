@@ -156,7 +156,7 @@ const FileCard = ({item, update, removeFile, index}) => {
 
           <button
             onClick={() => removeFile(item)}
-            className="text-red-500 font-light text-lg cursor-pointer" 
+            className="text-accent-red font-light text-md cursor-pointer" 
           >
             Remove
           </button>
