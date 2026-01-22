@@ -59,9 +59,9 @@ const Login = () => {
     {/* </div> */}
 
     {/* Brand name */}
-    <span className="text-3xl font-semibold tracking-tight text-gray-900 max-md:text-xl">
-      MITS PRINT
-    </span>
+     <h1 className="text-2xl font-bold tracking-tight text-primary-black">
+            MITS <span className="text-accent-red font-black">PRINT</span>
+      </h1>
 
     {/* Divider */}
     <div className="w-[1px] h-10 bg-gray-400/40" />
@@ -137,7 +137,7 @@ const Login = () => {
 
                   <button
                   type="submit"
-                  className="w-full py-3 h-[50px] bg-black text-white rounded-xl font-medium hover:bg-black/90 transition flex justify-center items-center cursor-pointer">
+                  className="w-full py-3 h-[50px] bg-black text-white rounded-xl font-medium hover:bg-red-600 transition flex justify-center items-center cursor-pointer">
                   {load ? <DotLoader/> : "Login"}
                 </button>
                 </form>

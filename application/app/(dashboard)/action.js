@@ -78,23 +78,10 @@ export  async function startUploadMetaData(files) {
 
 
     const myFiles = files.map(({ file, ...rest }) => rest);
-    console.log(myFiles)
-    // const 
-    
-    // const metadata = dataWithOutFILE.map((item,index)=>({
-    //     ...item,
-    //     fileUrl:fileUrls[index]
-    // }))
-
-    const formData = new FormData();
-     myFiles.forEach(item => {
-    formData.append("metadata", JSON.stringify(item));
-    });
-
 
     const res = await fetch('/api/upload', {
         method:"POST",
-        body:formData
+        body:JSON.stringify(myFiles)
     })
 
 
@@ -107,31 +94,24 @@ export  async function startUploadMetaData(files) {
 
 
 
-export async function getSignedUploadUrls(files){
+export async function getSignedUploadUrls(fileMetaData){
 
+    try{
 
-
-// const files = fils.map(file=>file.file)
-console.log(files)
-const formData = new FormData();
-
-
-//adding all files array to formData with key files
-files.forEach(file => {
-  formData.append("files", file);
-});
-
-
-
-     const res = await fetch('/api/uploader', {
+    const res = await fetch('/api/uploader', {
     method: 'POST',
-    body: formData,
+    body: JSON.stringify(fileMetaData),
     });
 
 
     const { uploads } = await res.json();
 
     return uploads;
+
+    }catch(e){
+        console.error("uploadUrl error :"+e);
+    }
+    
     }
 
 

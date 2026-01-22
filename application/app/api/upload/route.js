@@ -4,14 +4,10 @@ import { randomUUID } from 'crypto';
 import { createOrder } from '../../../services/orders.service';
 
 export async function POST(req) {
-  const formData = await req.formData();
-
-const items = formData
-  .getAll("metadata")
-  .map(item => JSON.parse(item));
+  const myFiles = await req.json();
 
 
-   const orderId = await createOrder(items)
+   const orderId = await createOrder(myFiles)
 
 
   return NextResponse.json({

@@ -4,19 +4,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
   --foreground: #171717;
-  --primary-color:#f10a0a;
-  --secondary-color:#f8f8f8;
-  --text-primary-color:#292727;
+  --color-background: #FFFFFF;
+  --color-primary-black: #0F1115;
+  --color-accent-red: #E11D48;
+  --color-subtle-gray: #334155;
 }
 
 @theme inline {
-  --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary-color:var(--primary-color);
-  --color-secondary-color:var(--secondary-color);
-  --color-text-primary-color:var(--text-primary-color);
+  --color-background: #FFFFFF;
+  --color-primary-black: #0F1115;
+  --color-accent-red: #E11D48;
+  --color-subtle-gray: #334155;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-changa:"Changa One",sans-serif;
