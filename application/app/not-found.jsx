@@ -25,7 +25,7 @@ export default function NotFound() {
           <span className="text-[12rem] font-black leading-none text-slate-100 select-none">
             404
           </span>
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex ìtems-center justify-center">
              <div className="h-1 w-12 bg-rose-500 rounded-full mb-4 animate-pulse" />
           </div>
         </div>
@@ -47,10 +47,7 @@ export default function NotFound() {
 
       </div>
 
-      {/* Simple Footer */}
-      {/* <footer className="absolute bottom-8 text-slate-300 text-xs tracking-widest uppercase">
-        © {new Date().getFullYear()} MITS PRINT
-      </footer> */}
+      
     </div>
   );
 }
