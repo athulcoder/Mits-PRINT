@@ -24,6 +24,7 @@ export async function POST(req){
     
     //  delete the file from the bucket (GCS)
 
+    console.log("file sec : "+urls)
     await deleteFromMinio(urls)
 
 
