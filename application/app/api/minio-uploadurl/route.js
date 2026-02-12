@@ -46,11 +46,16 @@ export async function POST(req) {
         objectName,
         60 * 6 // 6 minutes
       );
+      const downloadUrl = await minioClient.presignedGetObject(
+        process.env.BUCKET_NAME,
+        objectName,
+        60 * 15
+        );
 
       return {
         id,
         uploadUrl,
-        fileUrl: `${process.env.MINIO_PUBLIC_URL}/${process.env.BUCKET_NAME}/${objectName}`,
+        fileUrl:downloadUrl
       };
     })
   );
