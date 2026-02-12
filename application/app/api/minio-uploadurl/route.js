@@ -49,7 +49,7 @@ export async function POST(req) {
       const downloadUrl = await minioClient.presignedGetObject(
         process.env.BUCKET_NAME,
         objectName,
-        60 * 15
+        60 * 15 //15 minutes
         );
 
       return {
