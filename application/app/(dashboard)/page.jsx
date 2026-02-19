@@ -159,7 +159,7 @@ const Homepage = () => {
               });
             });
           } catch (err) {
-            console.error("Upload init failed", err);
+            console.log("Upload init failed", err);
           }
   }
 
