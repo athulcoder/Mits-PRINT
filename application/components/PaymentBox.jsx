@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 import { FaIndianRupeeSign } from "react-icons/fa6";
 import UploadProgressBar from "./UploadProgressBar";
 import GreenSpinner from './PriceLoadingAnimation';
-
+import { loadScript } from '@/utils/loadScript.razorpay';
+import { getWithExpiry, setWithExpiry } from '@/utils/tempStorageLocal';
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function PaymentBox({ open, onClose, amount, files }) {
   const [loading, setLoading] = useState(false);
@@ -15,51 +17,30 @@ export default function PaymentBox({ open, onClose, amount, files }) {
   const [allUploaded, setAllUploaded] = useState(false);
 
 
+  const router = useRouter();
   useEffect(()=>{
  
   })
   if (!open) return null;
 
     const loadRazorpay = async () => {
-    const res = await fetch("/api/orders", { method: "POST",body:JSON.stringify({amount:amount}) });
-    const order = await res.json();
-
+      console.log(files)
+    const res = await fetch("/api/orders", { method: "POST",body:JSON.stringify({amount:amount,files}) });
+    const {razorpayOrder, printOrderId} = await res.json();
+    console.log(printOrderId+"from frontend")
+    setWithExpiry("printOrderId", printOrderId, 10 * 60 * 1000);
+    
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: order.amount,
-      currency: order.currency,
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
+      description:"Pay the amount to confirm the order",
       name: "MITS PRINT",
-      order_id: order.id,
+      image:"/mitsprint.png",
+      order_id: razorpayOrder.id,
       handler: async function (response) {
-            const res = await fetch("/api/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(response),
-          });
-
-          const verify = await res.json();
-
-            if (verify.success) {
-
-              //upload metadata to SERVER
-              const data=   await startUploadMetaData(files)
-
-            //show screen
-              
-            if(data.success){
-                  setLoading(false)
-                  onClose()
-                  window.location.href=`/myprints?order_id=${data.orderId}`
-          
-            }
-            else{
-              alert("Something went wrong!!!!")
-            }
-           
-            } 
-            else {
-              alert("Payment verification failed");
-            }
+          const orderId = getWithExpiry("printOrderId");
+          router.push(`/verifying-payment?orderId=${orderId}`);
     },
 
       theme: { color: "#3399cc" },
@@ -67,14 +48,28 @@ export default function PaymentBox({ open, onClose, amount, files }) {
   const rzp = new (window).Razorpay(options);
     onClose()
     rzp.open();
+    rzp.on('payment.failed',(res)=>{
+      window.alert('Payment failed')
+    })
   }
 
     const handlePay = async () => {
-
+      
       setRazorpayLoading(true);
-      loadRazorpay()
-      setRazorpayLoading(false)
 
+      try{
+        const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+
+        if(!res) window.alert("Razorpay failed to open. check your network and try again");
+        
+        loadRazorpay()
+
+
+      }catch(err){
+        console.log(err)
+      }
+
+      setRazorpayLoading(false)
 
   }
 

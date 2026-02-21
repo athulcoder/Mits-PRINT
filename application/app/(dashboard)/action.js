@@ -109,7 +109,7 @@ export async function getSignedUploadUrls(fileMetaData){
     return uploads;
 
     }catch(e){
-        console.error("uploadUrl error :"+e);
+        console.log("uploadUrl error :"+e);
     }
     
     }

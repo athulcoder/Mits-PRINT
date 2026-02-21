@@ -28,7 +28,7 @@ enum Orientation {
 
 enum PaymentStatus {
   PENDING
-  SUCCESS
+  PAID
   FAILED
   REFUNDED
 }
@@ -138,7 +138,7 @@ model Order {
   status PrintStatus @default(PENDING)
   studentId String
   student Student @relation(fields: [studentId],references: [id])
-
+  paymentStatus PaymentStatus @default(PENDING)
   prints Print[]
 
   //payment
@@ -151,35 +151,35 @@ model Order {
 }
 
 
-model Payment {
-  
-  id String @id @default(cuid())
-  amount  Int //store as paisa  (10.25 as 1025)
-  currency String @default("INR")
-  status PaymentStatus @default(PENDING)
+  model Payment {
+    
+    id String @id @default(cuid())
+    amount  Int //store as paisa  (10.25 as 1025)
+    currency String @default("INR")
+    status PaymentStatus @default(PENDING)
 
 
 
-  orderId String @unique
-  order Order @relation(fields: [orderId] ,references: [id])
+    orderId String @unique
+    order Order @relation(fields: [orderId] ,references: [id])
 
-  //razorpay fields
-  razorpayOrderId  String @unique
-  razorpayPaymentId String?
-  razorpaySignature String?
+    //razorpay fields
+    razorpayOrderId  String @unique
+    razorpayPaymentId String?
+    method String?
+
+    verified Boolean @default(false)
+    //Student
+    studentId String
+    student Student @relation(fields: [studentId], references: [id])
+
+    
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
 
-  //Student
-  studentId String @unique
-  student Student @relation(fields: [studentId], references: [id])
-
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-
-  @@index([razorpayOrderId])
-}
+    @@index([razorpayOrderId])
+  }
 
 
 
