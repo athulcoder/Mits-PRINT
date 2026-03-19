@@ -9,6 +9,7 @@ export async function upsertStudent(user) {
         update: {
             name: user.name,
             batch,
+            image:user.image,
             department,
         },
         create: {
