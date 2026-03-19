@@ -1,6 +1,6 @@
 import { getSession } from "next-auth/react"
 import { prisma } from "../lib/prisma"
-import { authOptions } from "../app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth/authOptions";
 import { getServerSession } from "next-auth";
 import { generate5DigitCode } from "./otp";
 

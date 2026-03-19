@@ -1,8 +1,8 @@
 
+import { authOptions } from "@/lib/auth/authOptions";
 import { prisma } from "../lib/prisma"
 import { getServerSession } from "next-auth";
-import { authOptions } from "../app/api/auth/[...nextauth]/route";
-
+import { authOptions } from "@/lib/auth/authOptions";
 
 
 export async function updatePrinterStatus(data) {
