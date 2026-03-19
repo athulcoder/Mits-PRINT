@@ -11,7 +11,7 @@ export async function createOrder(items, razorpayOrder) {
   //FIND USER 
 
   const session = await getServerSession(authOptions)
-  const user = await prisma.student.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
       email: session.user.email
     }
