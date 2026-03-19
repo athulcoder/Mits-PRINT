@@ -52,8 +52,8 @@ enum PrintRange {
 
 model Account {
   id                String  @id @default(uuid())
-  studentId         String
-  student           Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   type              String
   provider          String
@@ -74,22 +74,22 @@ model Account {
 model Session {
   id           String   @id @default(uuid())
   sessionToken String   @unique
-  studentId    String
-  student      Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   expires      DateTime
 }
 
 
 
-model Student {
+model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
   image     String?
+  emailVerified DateTime?
 
   orders    Order[]
-
   accounts  Account[]
   sessions  Session[]
   batch String?
@@ -131,8 +131,8 @@ model Order {
   id String @id @default(cuid())
   otpCode String
   status PrintStatus @default(PENDING)
-  studentId String
-  student Student @relation(fields: [studentId],references: [id])
+  userId String
+  user User @relation(fields: [userId],references: [id])
   paymentStatus PaymentStatus @default(PENDING)
   prints Print[]
 
@@ -141,7 +141,7 @@ model Order {
 
   createdAt DateTime @default(now())
 
-  @@index([studentId])
+  @@index([userId])
   @@index([otpCode])
 }
 
@@ -164,9 +164,9 @@ model Order {
     method String?
 
     verified Boolean @default(false)
-    //Student
-    studentId String
-    student Student @relation(fields: [studentId], references: [id])
+    //User
+    userId String
+    user User @relation(fields: [userId], references: [id])
 
     
     createdAt DateTime @default(now())

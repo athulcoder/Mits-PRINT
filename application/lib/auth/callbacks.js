@@ -1,18 +1,14 @@
 import { upsertStudent } from "./service";
 
 export const callbacks = {
-    async signIn({ user }) {
-        
-        if (!user.email?.endsWith("@mgits.ac.in")) {
-            return false;
-        }
+  async signIn({ user }) {
+    if (!user.email?.endsWith("@mgits.ac.in")) {
+      return false;
+    }
+    return true;
+  },
 
-        await upsertStudent(user);
-        return true;
-    },
-
-    async session({ session }) {
-        console.log(session)
-        return session;
-    },
+  async session({ session }) {
+    return session;
+  },
 };

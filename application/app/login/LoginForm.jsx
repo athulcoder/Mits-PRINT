@@ -87,12 +87,12 @@ const Login = () => {
             </div>
 
             <div className="bg-white/80 backdrop-blur-xl border border-white/80 p-8 sm:p-12 rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] transition-all duration-500 hover:shadow-[0_16px_60px_rgb(0,0,0,0.1)] hover:-translate-y-1 relative overflow-hidden group">
-              
+
               {/* Decorative inner glow */}
               <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-red-400/10 to-transparent rounded-full blur-3xl -mx-24 -my-24 transition-all duration-700 group-hover:scale-150 pointer-events-none" />
 
               <div className="relative z-10 flex flex-col items-center">
-                
+
                 <div className="mb-10 text-center w-full">
                   <h2 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Welcome back</h2>
                   <div className="bg-red-50/80 text-red-700 border border-red-100 rounded-xl p-4 mb-3 shadow-sm">
