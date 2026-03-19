@@ -1,5 +1,4 @@
 
-import { authOptions } from "@/lib/auth/authOptions";
 import { prisma } from "../lib/prisma"
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
@@ -7,13 +6,13 @@ import { authOptions } from "@/lib/auth/authOptions";
 
 export async function updatePrinterStatus(data) {
 
-    const {printerId , printerStatus , printerReason} =data;
+    const { printerId, printerStatus, printerReason } = data;
 
     const p = await prisma.printer.update({
-        where:{id :printerId},
-        data:{
-            status:printerStatus,
-            reason:printerReason
+        where: { id: printerId },
+        data: {
+            status: printerStatus,
+            reason: printerReason
         }
     });
 
@@ -22,10 +21,10 @@ export async function updatePrinterStatus(data) {
 
 
 
-export async function getPrinterStatus(printerId){
+export async function getPrinterStatus(printerId) {
 
     const printer = await prisma.printer.findUnique({
-        where:{id:printerId}
+        where: { id: printerId }
     });
 
 
