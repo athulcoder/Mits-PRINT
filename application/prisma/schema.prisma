@@ -83,24 +83,19 @@ model Session {
 
 
 model Student {
-  id  String @id @default(cuid())
-  email String @unique 
-  name String 
-  password String
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
 
-  //orders array
-  orders Order[]
+  orders    Order[]
 
-
-  // NextAuth relations
-  accounts      Account[]
-  sessions      Session[]
-
-
-  payments Payment[]
+  accounts  Account[]
+  sessions  Session[]
+  batch String?
+  department String?
+  payments  Payment[]
   createdAt DateTime @default(now())
-
-  
 }
 
 
