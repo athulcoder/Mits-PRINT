@@ -18,58 +18,66 @@ export default function PaymentBox({ open, onClose, amount, files }) {
 
 
   const router = useRouter();
-  useEffect(()=>{
- 
+  useEffect(() => {
+
   })
   if (!open) return null;
 
-    const loadRazorpay = async () => {
-      console.log(files)
-    const res = await fetch("/api/orders", { method: "POST",body:JSON.stringify({amount:amount,files}) });
-    const {razorpayOrder, printOrderId} = await res.json();
-    console.log(printOrderId+"from frontend")
-    setWithExpiry("printOrderId", printOrderId, 10 * 60 * 1000);
-    
-    const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: razorpayOrder.amount,
-      currency: razorpayOrder.currency,
-      description:"Pay the amount to confirm the order",
-      name: "MITS PRINT",
-      image:"/mitsprint.png",
-      order_id: razorpayOrder.id,
-      handler: async function (response) {
+  const loadRazorpay = async () => {
+    console.log(files)
+    try {
+      const res = await fetch("/api/orders", { method: "POST", body: JSON.stringify({ amount: amount, files }) });
+      const { razorpayOrder, printOrderId } = await res.json();
+
+
+      console.log(printOrderId + "from frontend")
+      setWithExpiry("printOrderId", printOrderId, 10 * 60 * 1000);
+
+      console.log(razorpayOrder + " hahahhhahha")
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: 0,
+        currency: razorpayOrder.currency,
+        description: "Pay the amount to confirm the order",
+        name: "MITS PRINT",
+        image: "/mitsprint.png",
+        order_id: razorpayOrder.id,
+        handler: async function (response) {
           const orderId = getWithExpiry("printOrderId");
           router.push(`/verifying-payment?orderId=${orderId}`);
-    },
+        },
 
-      theme: { color: "#3399cc" },
-    };
-  const rzp = new (window).Razorpay(options);
-    onClose()
-    rzp.open();
-    rzp.on('payment.failed',(res)=>{
-      window.alert('Payment failed')
-    })
+        theme: { color: "#3399cc" },
+      };
+      const rzp = new (window).Razorpay(options);
+      onClose()
+      rzp.open();
+      rzp.on('payment.failed', (res) => {
+        window.alert('Payment failed')
+      })
+
+    } catch (err) {
+      console.log(err)
+    }
   }
 
-    const handlePay = async () => {
-      
-      setRazorpayLoading(true);
+  const handlePay = async () => {
 
-      try{
-        const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+    setRazorpayLoading(true);
 
-        if(!res) window.alert("Razorpay failed to open. check your network and try again");
-        
-        loadRazorpay()
+    try {
+      const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+      console.log(res + " from frontend")
+      if (!res) window.alert("Razorpay failed to open. check your network and try again");
+      console.log("BEFORE RAZOR")
+      loadRazorpay()
 
 
-      }catch(err){
-        console.log(err)
-      }
+    } catch (err) {
+      console.log(err)
+    }
 
-      setRazorpayLoading(false)
+    setRazorpayLoading(false)
 
   }
 
@@ -86,36 +94,36 @@ export default function PaymentBox({ open, onClose, amount, files }) {
 
         {/* Loading state */}
         {loading ? (
-            <UploadProgressBar
-              file={files[currentFileIndex]?.file}
-              progress={progress}
-              allUploaded={allUploaded}
-            />
-                    ) : (
+          <UploadProgressBar
+            file={files[currentFileIndex]?.file}
+            progress={progress}
+            allUploaded={allUploaded}
+          />
+        ) : (
           <>
             {/* Amount */}
-              <div className="flex items-center justify-center gap-1 py-6 text-4xl font-semibold text-gray-900">
-           
+            <div className="flex items-center justify-center gap-1 py-6 text-4xl font-semibold text-gray-900">
 
-        
+
+
               <FaIndianRupeeSign className="text-3xl" />
-              {(Number.parseFloat(amount+.00)/100).toFixed(2)}
+              {(Number.parseFloat(amount + .00) / 100).toFixed(2)}
 
-              </div>
-             
+            </div>
 
 
-            
+
+
 
             {/* Buttons */}
             <div className="flex flex-col gap-3">
               <button
                 onClick={handlePay}
                 disabled={razorpayLoading}
-                className={`h-11 rounded-xl  text-lg font-medium text-white  transition cursor-pointer ${razorpayLoading?"bg-gray-400":"bg-green-500"}
+                className={`h-11 rounded-xl  text-lg font-medium text-white  transition cursor-pointer ${razorpayLoading ? "bg-gray-400" : "bg-green-500"}
                            `}
               >
-                {razorpayLoading?<div className='flex justify-center items-center gap-3'><GreenSpinner size={26}/></div>:"Procced to Pay"}
+                {razorpayLoading ? <div className='flex justify-center items-center gap-3'><GreenSpinner size={26} /></div> : "Procced to Pay"}
               </button>
 
               <button
@@ -128,7 +136,7 @@ export default function PaymentBox({ open, onClose, amount, files }) {
             </div>
           </>
         )}
-        
+
 
       </div>
     </div>

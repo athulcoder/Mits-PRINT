@@ -4,39 +4,39 @@ import { createOrder } from "../../../services/orders.service";
 
 
 export async function POST(req) {
-   
-  try{
+
+  try {
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-    return NextResponse.json(
-      { error: "Razorpay keys not configured" },
-      { status: 500 }
-    );
-  }
+      return NextResponse.json(
+        { error: "Razorpay keys not configured" },
+        { status: 500 }
+      );
+    }
     const body = await req.json();
 
-    const {amount,files} = body;
-    
-  const razorpayOrder = await razorpay.orders.create({
-    amount:amount, 
-    currency: "INR",
-    receipt: `rcpt_${Date.now()}`,
-  });
 
-  console.log(razorpayOrder)
-
-  //add the files to db and get the orderId (purchase id)
-  const printOrderId = await createOrder(files,razorpayOrder)
+    const { amount, files } = body;
+    const razorpayOrder = await razorpay.orders.create({
+      amount: amount,
+      currency: "INR",
+      receipt: `rcpt_${Date.now()}`,
+    });
 
 
-  
-  return NextResponse.json({razorpayOrder,printOrderId});
+    //add the files to db and get the orderId (purchase id)
+    const printOrderId = await createOrder(files, razorpayOrder)
 
 
 
-  }catch(er){
-   return NextResponse.json(
-      { error: "Failed to create payment order" ,
-        mess:er.message
+    return NextResponse.json({ razorpayOrder, printOrderId });
+
+
+
+  } catch (er) {
+    return NextResponse.json(
+      {
+        error: "Failed to create payment order",
+        mess: er.message
       },
       { status: 500 }
     );

@@ -4,17 +4,16 @@ import { authOptions } from "@/lib/auth/authOptions";
 import { getServerSession } from "next-auth";
 import { generate5DigitCode } from "./otp";
 
-export  async function createOrder(items,razorpayOrder){
+export async function createOrder(items, razorpayOrder) {
 
   //items->file 
   //razorpayOrder the payment details
   //FIND USER 
 
-  console.log(razorpayOrder)
   const session = await getServerSession(authOptions)
   const user = await prisma.student.findUnique({
-    where:{
-      email:session.user.email
+    where: {
+      email: session.user.email
     }
   })
 
@@ -23,7 +22,7 @@ export  async function createOrder(items,razorpayOrder){
   const currentOrder = await prisma.order.create({
     data: {
       otpCode,
-      studentId: user.id,
+      userId: user.id,
       prints: {
         create: items.map(item => ({
           fileUrl: item.fileUrl,
@@ -36,82 +35,83 @@ export  async function createOrder(items,razorpayOrder){
         })),
       },
       payment: {
-        create:{
-          amount:razorpayOrder.amount,
-          razorpayOrderId:razorpayOrder.id,
-          studentId:user.id
+        create: {
+          amount: razorpayOrder.amount,
+          razorpayOrderId: razorpayOrder.id,
+          userId: user.id
         }
-       }
+      }
     },
   });
 
 
   return currentOrder.id
-  
+
 }
 
 
 
-export async function getOrderfromDB(){
+export async function getOrderfromDB() {
 
-const orders = await prisma.order.findMany({
-  where: {
-        status: "PENDING",
-        paymentStatus:"PAID"
+  const orders = await prisma.order.findMany({
+    where: {
+      status: "PENDING",
+      paymentStatus: "PAID"
     },
-  include: {
-    prints: {
-    },
-    student:{
-        select:{
-          id:true,
-          email:true,
-          name:true,
+    include: {
+      prints: {
+      },
+      student: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
         }
-      }  },
-});
+      }
+    },
+  });
 
-//after recieving there orders i have to put the status 
-
-
-await prisma.order.updateMany({
-  where: {
-    id: { in: orders.map(o => o.id) },
-    status: "PENDING",
-  },
-  data: {
-    status: "PRINTING",
-  },
-});
+  //after recieving there orders i have to put the status 
 
 
+  await prisma.order.updateMany({
+    where: {
+      id: { in: orders.map(o => o.id) },
+      status: "PENDING",
+    },
+    data: {
+      status: "PRINTING",
+    },
+  });
 
-return orders;
+
+
+  return orders;
 
 
 
 }
 
 
-export async function updateOrderStatus(data){
+export async function updateOrderStatus(data) {
 
-  const {orderId , orderStatus} = data;
+  const { orderId, orderStatus } = data;
 
   const orders = await prisma.order.update({
-    where:{id:orderId},
-    data:{
-      status:orderStatus
+    where: { id: orderId },
+    data: {
+      status: orderStatus
     },
-    include:{
-        prints:{
-          select:{
-            fileUrl:true
-          }
+    include: {
+      prints: {
+        select: {
+          fileUrl: true
         }
+      }
     }
   });
 
-  const {prints} = orders;
-  if(orders) return prints;
+  const { prints } = orders;
+  if (orders) return prints;
   return [];
 }
