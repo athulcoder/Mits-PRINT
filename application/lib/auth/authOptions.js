@@ -14,6 +14,7 @@ export const authOptions = {
 
     events: {
         async signIn({ user }) {
+            console.log("USER FROM LOGIN "+user)
             await upsertStudent(user);
         },
     },

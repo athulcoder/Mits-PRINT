@@ -9,7 +9,7 @@ import { MdOutlineVerified, MdPendingActions } from "react-icons/md";
 import { formatDate } from "../utils/dateFormater";
 import { RiPrinterCloudFill } from "react-icons/ri";
 
-export default function MyPrintsPage({data}) {
+export default function MyPrintsPage({ data }) {
   const [showPopup, setShowPopup] = useState(false);
   const [allOrders, setAllOrders] = useState([]);
   const [currentOrder, setCurrentOrder] = useState();
@@ -26,7 +26,7 @@ export default function MyPrintsPage({data}) {
 
     setHandledOrderId(order_id);
     showOrderPlacedMessage(order_id);
-    
+
   }, [order_id, handledOrderId, data]);
 
   const showOrderPlacedMessage = async (orderId) => {
@@ -37,7 +37,7 @@ export default function MyPrintsPage({data}) {
           method: "GET",
         }
       );
-  
+
       const mes = await res.json();
       if (mes.success) {
         setCurrentOrder(mes.data);
@@ -46,12 +46,12 @@ export default function MyPrintsPage({data}) {
     } catch (err) {
       console.error("Failed to fetch recent order", err);
     }
-  }; 
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start py-8 bg-gray-50/30">
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
-        
+
         {/* Heading */}
         <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
           <div className="flex items-center gap-3">
@@ -60,19 +60,15 @@ export default function MyPrintsPage({data}) {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
-                My Prints
+                My Orders
               </h2>
               <p className="text-sm font-medium text-gray-500">
                 Track and manage your recent print orders
               </p>
             </div>
           </div>
-          
-          {allOrders?.length > 0 && (
-            <span className="bg-green-50 text-green-700 font-semibold px-3.5 py-1.5 border border-green-100 rounded-lg text-sm shadow-sm self-start sm:self-auto">
-              {allOrders.length} Order{allOrders.length > 1 ? 's' : ''}
-            </span>
-          )}
+
+
         </div>
 
         {/* Empty State */}
@@ -140,7 +136,7 @@ export default function MyPrintsPage({data}) {
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-1">
                     <FiShield /> Secret Code
                   </p>
-                  <p className="font-mono text-xl sm:text-2xl font-extrabold tracking-[0.2em] text-gray-800 group-hover:text-green-700 transition-colors">
+                  <p className="font-mono text-xl sm:text-2xl font-extrabold tracking-[0.2em] text-green-800 group-hover:text-gray-700 transition-colors">
                     {order.otpCode}
                   </p>
                   <p className="mt-1 text-[10px] font-semibold text-gray-400 flex items-center justify-center gap-1">
@@ -170,9 +166,9 @@ export default function MyPrintsPage({data}) {
 
             <div className="flex flex-col items-center text-center space-y-4 pt-2">
               <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-2 shadow-inner">
-                 <IoMdCheckmarkCircleOutline size={40} />
+                <IoMdCheckmarkCircleOutline size={40} />
               </div>
-              
+
               <h2 className="text-xl font-bold text-gray-800 tracking-tight">
                 Success! Files Sent
               </h2>
