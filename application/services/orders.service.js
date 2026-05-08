@@ -61,7 +61,7 @@ export async function getOrderfromDB() {
     include: {
       prints: {
       },
-      student: {
+      user: {
         select: {
           id: true,
           email: true,
