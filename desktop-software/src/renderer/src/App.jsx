@@ -22,7 +22,7 @@ function App() {
         </div>
         <div className="action">
           <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
+            Send IPC hahaha
           </a>
         </div>
       </div>
