@@ -1,7 +1,7 @@
 import { getOrderfromDB } from "../../../services/orders.service";
 import { NextResponse } from "next/server";
 
-
+//since this is GET request secret key is sent as query parameter and not in the headers of the request
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
 

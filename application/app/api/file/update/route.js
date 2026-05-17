@@ -3,15 +3,16 @@ import { updateOrderStatus } from "../../../../services/orders.service";
 import { NextResponse } from "next/server";
 
 export async function POST(req){
+    const secretKey = req.headers.get("SECRET_KEY")
 
     try{
 
     const body = await req.json();
 
-    const {SECRET_KEY} = body;
+    // const {SECRET_KEY} = body;
     
-    if(SECRET_KEY != process.env.SECRET_KEY){
-        throw e
+    if(secretKey != process.env.SECRET_KEY){
+        throw new Error("Invalid secret key");
     }
 
     //get the array of urls of files here
