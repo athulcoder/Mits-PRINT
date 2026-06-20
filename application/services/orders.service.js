@@ -53,24 +53,36 @@ export async function createOrder(items, razorpayOrder) {
 
 export async function getOrderfromDB() {
 
-  const orders = await prisma.order.findMany({
-    where: {
-      status: "PENDING",
-      paymentStatus: "PAID"
-    },
-    include: {
-      prints: {
-      },
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-        }
+const orders = await prisma.order.findMany({
+  where: {
+    status: "PENDING",
+    paymentStatus: "PAID"
+  },
+
+  include: {
+
+    prints: true,
+
+    payment: {
+      select: {
+        amount: true,
+        status: true,
+        createdAt: true
       }
     },
-  });
 
+    user: {
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        batch: true,
+        department: true,
+        image: true
+      }
+    }
+  }
+});
   //after recieving there orders i have to put the status 
 
 
