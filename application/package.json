@@ -6,12 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "prisma db seed"
   },
-
-
-
-  
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "engines": {
     "node": ">=20.19.0"
   },
@@ -40,6 +40,8 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/node": "26.1.1",
+    "@types/react": "19.2.17",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
     "tailwindcss": "^4"

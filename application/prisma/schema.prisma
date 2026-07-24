@@ -9,14 +9,13 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 //enumerators
 
-
-enum ColorMode { 
+enum ColorMode {
   COLOR
   BLACK_WHITE
 }
@@ -33,7 +32,7 @@ enum PaymentStatus {
   REFUNDED
 }
 
-enum PrintStatus  {
+enum PrintStatus {
   PENDING
   PRINTING
   PRINTED
@@ -46,95 +45,87 @@ enum PrintRange {
   CUSTOM
 }
 
-
+enum PaymentProvider {
+  RAZORPAY
+  PAYTM
+}
 
 //MODELS
 
 model Account {
-  id                String  @id @default(uuid())
-  userId         String
-  user           User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   type              String
   provider          String
   providerAccountId String
 
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
+  refresh_token String?
+  access_token  String?
+  expires_at    Int?
+  token_type    String?
+  scope         String?
+  id_token      String?
+  session_state String?
 
   @@unique([provider, providerAccountId])
 }
 
-
 model Session {
-  id           String   @id @default(uuid())
-  sessionToken String   @unique
-  userId    String
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String @id @default(uuid())
+  sessionToken String @unique
+  userId       String
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  expires      DateTime
+  expires DateTime
 }
-
-
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  image     String?
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
   emailVerified DateTime?
 
-  orders    Order[]
-  accounts  Account[]
-  sessions  Session[]
-  batch String?
+  orders     Order[]
+  accounts   Account[]
+  sessions   Session[]
+  batch      String?
   department String?
-  payments  Payment[]
-  createdAt DateTime @default(now())
+  payments   Payment[]
+  createdAt  DateTime  @default(now())
 }
-
 
 //Print
 
-
 model Print {
-  id String @id @default(cuid())
-  fileUrl String
-  copies Int @default(1)
-  colorMode ColorMode
-  orientation Orientation @default(PORTRAIT)
-  printOnBothSides Boolean @default(false)
+  id               String      @id @default(cuid())
+  fileUrl          String
+  copies           Int         @default(1)
+  colorMode        ColorMode
+  orientation      Orientation @default(PORTRAIT)
+  printOnBothSides Boolean     @default(false)
 
-  pageRange PrintRange @default(ALL)
-  customRange String? 
+  pageRange   PrintRange @default(ALL)
+  customRange String?
 
   orderId String
-  order Order @relation(fields: [orderId], references: [id])
+  order   Order  @relation(fields: [orderId], references: [id])
 
   createdAt DateTime @default(now())
-  
 
   @@index([orderId])
-
-
 }
 
-
-
 model Order {
-
-  id String @id @default(cuid())
-  otpCode String
-  status PrintStatus @default(PENDING)
-  userId String
-  user User @relation(fields: [userId],references: [id])
+  id            String        @id @default(cuid())
+  otpCode       String
+  status        PrintStatus   @default(PENDING)
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
   paymentStatus PaymentStatus @default(PENDING)
-  prints Print[]
+  prints        Print[]
 
   //payment
   payment Payment?
@@ -145,38 +136,30 @@ model Order {
   @@index([otpCode])
 }
 
+model Payment {
+  id       String        @id @default(cuid())
+  amount   Int //store as paisa  (10.25 as 1025)
+  currency String        @default("INR")
+  status   PaymentStatus @default(PENDING)
 
-  model Payment {
-    
-    id String @id @default(cuid())
-    amount  Int //store as paisa  (10.25 as 1025)
-    currency String @default("INR")
-    status PaymentStatus @default(PENDING)
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id])
 
+  //razorpay fields
+  razorpayOrderId   String  @unique
+  razorpayPaymentId String?
+  method            String?
 
+  verified Boolean @default(false)
+  //User
+  userId   String
+  user     User    @relation(fields: [userId], references: [id])
 
-    orderId String @unique
-    order Order @relation(fields: [orderId] ,references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    //razorpay fields
-    razorpayOrderId  String @unique
-    razorpayPaymentId String?
-    method String?
-
-    verified Boolean @default(false)
-    //User
-    userId String
-    user User @relation(fields: [userId], references: [id])
-
-    
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-
-    @@index([razorpayOrderId])
-  }
-
-
+  @@index([razorpayOrderId])
+}
 
 enum PrinterStatus {
   OFF
@@ -185,12 +168,31 @@ enum PrinterStatus {
   ERROR
 }
 
+model Printer {
+  id        String        @id @unique
+  name      String
+  status    PrinterStatus @default(READY)
+  reason    String?
+  type      ColorMode
+  updatedAt DateTime      @updatedAt
+}
 
-model Printer{
-  id String @id @unique
-  name String 
-  status PrinterStatus @default(READY)
-  reason String?
-  type ColorMode 
-  updatedAt DateTime @updatedAt
+model Admin {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  fullName       String
+  hashedPassword String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model PaymentProviderConfiguration {
+  id            String          @id @default(cuid())
+  provider      PaymentProvider @unique
+  displayName   String
+  isActive      Boolean         @default(true)
+  isLive        Boolean         @default(false)
+  configuration Json
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }

@@ -24,7 +24,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy only what we need
+# Copy dependencies and build artifacts
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
@@ -34,4 +34,5 @@ COPY --from=builder /app/next.config.* ./
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Execute database migrations, seed initial admin, and start Next.js production server
+CMD ["sh", "-c", "npx prisma migrate deploy || true && npx prisma db seed || true && npm start"]

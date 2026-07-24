@@ -2,11 +2,16 @@ version: "3.9"
 
 services:
   app:
-    build: .
-    container_name: nextjs_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mits_print_app
     ports:
       - "3000:3000"
     env_file:
       - .env
+    environment:
+      - NODE_ENV=production
+      - ADMIN_ROUTE_URL_SECRET=${ADMIN_ROUTE_URL_SECRET:-mitsadminsecret2026}
+      - PAYMENT_CONFIG_ENCRYPTION_KEY=${PAYMENT_CONFIG_ENCRYPTION_KEY:-mits-print-default-secret-key-32bytes!}
     restart: unless-stopped
-  
