@@ -34,5 +34,5 @@ COPY --from=builder /app/next.config.* ./
 
 EXPOSE 3000
 
-# Execute database migrations, seed initial admin, and start Next.js production server
-CMD ["sh", "-c", "npx prisma migrate deploy || true && npx prisma db seed || true && npm start"]
+# Execute database migrations, seed initial data on container start, and launch production server
+CMD ["sh", "-c", "npx prisma migrate deploy || true; npx prisma db seed || true; npm start"]
