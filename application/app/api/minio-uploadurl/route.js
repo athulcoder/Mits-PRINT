@@ -1,11 +1,11 @@
 
 import { NextResponse } from "next/server";
-import { minioClient } from "../../../lib/minio";
+import { getMinioClient } from "@/lib/minio";
 
 export async function POST(req) {
   let fileMetaData;
 
-  
+  const minioClient = getMinioClient();
   try {
     fileMetaData = await req.json();
   } catch {
@@ -14,7 +14,7 @@ export async function POST(req) {
       { status: 400 }
     );
   }
-
+  
   if (!Array.isArray(fileMetaData) || fileMetaData.length === 0) {
     return NextResponse.json(
       { error: "Invalid files array" },
@@ -52,12 +52,12 @@ export async function POST(req) {
         process.env.BUCKET_NAME,
         objectName,
         60 * 15 //15 minutes
-        );
+      );
 
       return {
         id,
         uploadUrl,
-        fileUrl:downloadUrl
+        fileUrl: downloadUrl
       };
     })
   );

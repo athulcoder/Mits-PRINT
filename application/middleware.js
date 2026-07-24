@@ -9,32 +9,40 @@ export async function middleware(req) {
   const isAdminRoute = pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
 
   if (isAdminRoute) {
+    // Allow admin login POST API route to proceed
+    if (pathname === "/api/admin/login") {
+      return NextResponse.next();
+    }
+
     const paramSecret =
       searchParams.get("key") ||
       searchParams.get("secret") ||
       searchParams.get("admin_secret");
     const headerSecret = req.headers.get("x-admin-secret");
     const cookieSecret = req.cookies.get("admin_route_secret")?.value;
+    const adminSession = req.cookies.get("admin_session")?.value;
 
     const isAuthorized =
-      Boolean(adminSecret) &&
-      (paramSecret === adminSecret ||
-        cookieSecret === adminSecret ||
-        headerSecret === adminSecret);
+      (Boolean(adminSecret) &&
+        (paramSecret === adminSecret ||
+          cookieSecret === adminSecret ||
+          headerSecret === adminSecret)) ||
+      Boolean(adminSession);
 
     if (isAuthorized) {
       const response = NextResponse.next();
       if (paramSecret === adminSecret && cookieSecret !== adminSecret) {
         response.cookies.set("admin_route_secret", adminSecret, {
-          path: "/", // Scope to root so /api/admin calls also receive the cookie
+          path: "/",
           httpOnly: true,
           sameSite: "lax",
+          maxAge: 60 * 60 * 24 * 7,
         });
       }
       return response;
     }
 
-    // Hide API routes with 418 status and VIP error message for unauthorized calls
+    // Hide API routes with 418 status and VIP message for unauthorized requests
     if (pathname.startsWith("/api/admin")) {
       return NextResponse.json(
         {

@@ -1,15 +1,11 @@
 import React from 'react';
-import PaymentProviderConfigManager from '@/components/admin/PaymentProviderConfigManager';
+import AdminSidebarLayout from '@/components/admin/AdminSidebarLayout';
 
 export const metadata = {
-  title: 'Admin Dashboard | Payment Configurations',
-  description: 'Manage admin settings and payment provider configurations.',
+  title: 'Admin Dashboard | MITS Print',
+  description: 'Manage payment gateways, Google Auth configuration, and printer settings.',
 };
 
-export default function AdminDashPage() {
-  return (
-    <div className="min-h-screen bg-slate-950">
-      <PaymentProviderConfigManager />
-    </div>
-  );
+export default function AdminDashboardPage() {
+  return <AdminSidebarLayout />;
 }

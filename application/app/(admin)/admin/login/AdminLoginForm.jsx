@@ -20,18 +20,26 @@ export default function AdminLoginForm() {
     setLoading(true);
 
     try {
-      // Simulate/Handle admin login process
       if (!email || !password) {
         setError('Please enter both email and password.');
         setLoading(false);
         return;
       }
 
-      // Navigate to admin dashboard on success
-      setTimeout(() => {
-        setLoading(false);
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
         router.push('/admin/dash');
-      }, 600);
+      } else {
+        setError(data.error || 'Invalid credentials.');
+        setLoading(false);
+      }
     } catch (err) {
       console.error(err);
       setError('An error occurred during login. Please try again.');

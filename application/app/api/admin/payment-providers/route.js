@@ -102,19 +102,33 @@ export async function POST(req) {
       def.fields
     );
 
+    const shouldBeActive = Boolean(isActive);
+
+    // Enforce Single Active Payment Gateway Rule: if activating this gateway, deactivate all others
+    if (shouldBeActive) {
+      await prisma.paymentProviderConfiguration.updateMany({
+        where: {
+          provider: { not: providerKey },
+        },
+        data: {
+          isActive: false,
+        },
+      });
+    }
+
     // Save/Upsert into Database
     const updatedRecord = await prisma.paymentProviderConfiguration.upsert({
       where: { provider: providerKey },
       update: {
         displayName: def.displayName,
-        isActive: Boolean(isActive),
+        isActive: shouldBeActive,
         isLive: Boolean(isLive),
         configuration: configToStore,
       },
       create: {
         provider: providerKey,
         displayName: def.displayName,
-        isActive: Boolean(isActive),
+        isActive: shouldBeActive,
         isLive: Boolean(isLive),
         configuration: configToStore,
       },
